@@ -1,0 +1,172 @@
+/* =====================================================================
+   PREVENT FOUC (FLASH OF UNSTYLED CONTENT) ON REFRESH
+===================================================================== */
+html:not(.js-ready) .tm-main-content { transform: scale(1.05); filter: blur(5px); transition: none !important; }
+
+/* =====================================================================
+   CUSTOM INTERACTIVE QUOTE TYPOGRAPHY
+===================================================================== */
+.quote-container { display: flex; justify-content: center; align-items: center; padding: 40px; font-family: 'Arial', sans-serif; }
+.custom-quote { display: flex; flex-direction: column; align-items: center; text-align: center; margin: 0; max-width: 600px; position: relative; }
+.custom-quote p { font-size: 1.5rem; color: #ffffff; margin: 5px 0; line-height: 1.4; }
+.custom-quote .highlight-text { color: #ffc107; font-weight: 800; }
+.custom-quote::before { content: "“"; font-size: 5rem; line-height: 1; color: #ffc107; font-family: Georgia, serif; margin-bottom: -10px; }
+.custom-quote::after { content: "”"; font-size: 5rem; line-height: 1; color: #ffc107; font-family: Georgia, serif; margin-top: 10px; }
+
+/* =====================================================================
+   BUBBLE POP REVEAL ANIMATION KEYFRAMES
+===================================================================== */
+:root { --bubble-hue: 51; --blue-dark: #001f33; --blue-mid: #005c99; --blue-light: #00ccff; }
+.pl__bubble { position: absolute; width: 3em; height: 3em; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; pointer-events: none; font-size: 45px; }
+.pl__bubble:before, .pl__bubble:after, .pl__bubble-drop { position: absolute; }
+.animate-bubble:before, .animate-bubble:after, .animate-bubble .pl__bubble-drop:before { animation-duration: 1.5s; animation-timing-function: linear; animation-fill-mode: forwards; }
+.pl__bubble:before, .pl__bubble:after { border-radius: 50%; }
+.pl__bubble:after, .pl__bubble-drop { top: 50%; left: 50%; }
+.pl__bubble:before { content: ""; display: block; width: 100%; height: 100%; box-shadow: 0 -0.0625em 0 0.0625em hsl(var(--bubble-hue), 90%, 90%) inset, 0 0 0 0.0625em hsl(var(--bubble-hue), 90%, 70%) inset, 0 0 0.25em 0.25em hsla(var(--bubble-hue), 90%, 70%, 0.7) inset; transform: translate(0, 4.5em) scale(0); }
+.animate-bubble:before { animation-name: bubble-rise-before; }
+.pl__bubble:after { content: ""; display: block; background-image: radial-gradient(25% 10% at 50% 5%, hsl(0, 0%, 100%) 48%, hsla(0, 0%, 100%, 0) 50%); width: 87.5%; height: 87.5%; transform: translate(-50%, -50%) translate(0, 4.5em) rotate(-45deg) scale(0); }
+.animate-bubble:after { animation-name: bubble-rise-after; }
+.pl__bubble-drop { width: 0.125em; height: 0.5em; transform: translate(-50%, -3em); transform-origin: 50% 0; }
+.pl__bubble-drop:nth-child(1) { transform: translate(-50%, -3em) rotate(0deg); }
+.pl__bubble-drop:nth-child(2) { transform: translate(-50%, -3em) rotate(45deg); }
+.pl__bubble-drop:nth-child(3) { transform: translate(-50%, -3em) rotate(90deg); }
+.pl__bubble-drop:nth-child(4) { transform: translate(-50%, -3em) rotate(135deg); }
+.pl__bubble-drop:nth-child(5) { transform: translate(-50%, -3em) rotate(180deg); }
+.pl__bubble-drop:nth-child(6) { transform: translate(-50%, -3em) rotate(225deg); }
+.pl__bubble-drop:nth-child(7) { transform: translate(-50%, -3em) rotate(270deg); }
+.pl__bubble-drop:nth-child(8) { transform: translate(-50%, -3em) rotate(315deg); }
+.pl__bubble-drop:before { content: ""; display: block; width: 100%; height: 100%; background-color: hsl(var(--bubble-hue), 90%, 80%); border-radius: 0.0625em; transform: translateY(0) scaleY(0); transform-origin: 50% 0; }
+.animate-bubble .pl__bubble-drop:before { animation-name: bubble-drop; }
+
+@keyframes bubble-rise-before { from { animation-timing-function: cubic-bezier(0.12, 0, 0.39, 0); transform: translate(0, 4.5em) scale(0); } 30% { animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); transform: translate(0, 0.75em) scale(1); } 60% { animation-timing-function: cubic-bezier(0.12, 0, 0.39, 0); opacity: 1; transform: translate(0, -3em) scale(1); } 70%, to { opacity: 0; transform: translate(0, -3em) scale(0.25); } }
+@keyframes bubble-rise-after { from { animation-timing-function: cubic-bezier(0.12, 0, 0.39, 0); transform: translate(-50%, -50%) translate(0, 4.5em) rotate(-45deg) scale(0); } 30% { animation-timing-function: cubic-bezier(0.61, 1, 0.88, 1); transform: translate(-50%, -50%) translate(0, 0.75em) rotate(-45deg) scale(1); } 60% { animation-timing-function: cubic-bezier(0.12, 0, 0.39, 0); opacity: 1; transform: translate(-50%, -50%) translate(0, -3em) rotate(-45deg) scale(1); } 70%, to { opacity: 0; transform: translate(-50%, -50%) translate(0, -3em) rotate(-45deg) scale(0.25); } }
+@keyframes bubble-drop { from { animation-timing-function: steps(1, end); visibility: hidden; transform: translateY(0) scaleY(1); } 65% { animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); visibility: visible; transform: translateY(0) scaleY(1); } 80%, to { transform: translateY(400%) scaleY(0); } }
+
+/* =====================================================================
+   PS VITA GLOSSY 3D BUBBLES
+===================================================================== */
+.product { 
+    position: relative; display: flex; justify-content: center; align-items: center; 
+    pointer-events: none; cursor: pointer; perspective: 1000px;
+}
+
+.product__bg { position: absolute; inset: 0; margin: auto; width: 165px; height: 165px; border-radius: 50%; pointer-events: none; z-index: 1; }
+
+.tm-nav-link {
+    perspective: 1000px; z-index: 2; position: relative; transform-style: preserve-3d;
+    
+    background: 
+        radial-gradient(circle at 50% 5%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 35%),
+        radial-gradient(circle at 30% 30%, #3a3a44, #111 70%, #000);
+        
+    box-shadow: inset -10px -10px 20px rgba(0,0,0,0.9), inset 10px 10px 20px rgba(255,255,255,0.1), 0 15px 35px rgba(0,0,0,0.8), 0 0 15px rgba(209, 178, 0, 0.2);
+    border: 1px solid rgba(209, 178, 0, 0.4); 
+    
+    width: 165px; height: 165px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+
+.tm-nav-icon, .tm-nav-text { transform: translateZ(20px); text-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: transform 0.5s ease, filter 0.4s ease; }
+
+.tm-nav-icon.front-face { display: block; color: #D1B200; margin-bottom: 25px; transform: translateZ(40px); text-shadow: 0 5px 15px rgba(0,0,0,0.9); }
+.tm-nav-text.front-face { position: absolute; color: #D1B200; left: 0; right: 0; bottom: 15px; text-align: center; transform: translateZ(30px); font-size: 15px; font-weight: bold; }
+
+.tm-nav-icon.back-face {
+    position: absolute; top: 35px; margin: 0 !important;
+    transform: rotateY(180deg) translateZ(40px);
+    filter: brightness(0.6); color: #D1B200;
+}
+.tm-nav-text.back-face {
+    position: absolute; color: #D1B200; left: 0; right: 0; bottom: 15px; text-align: center;
+    font-weight: bold; transform: rotateY(180deg) translateZ(30px);
+    filter: brightness(0.6); font-size: 15px;
+}
+
+.product.is-locked .tm-nav-link { border-color: transparent !important; background: transparent !important; box-shadow: none !important; }
+.product.is-locked .tm-nav-icon, .product.is-locked .tm-nav-text { opacity: 0 !important; transform: scale(0) translateZ(20px) !important; }
+.product.is-unlocked { pointer-events: auto; }
+.product.is-unlocked:hover .tm-nav-icon.front-face { filter: drop-shadow(0 0 12px #d1b200); }
+
+.icon-pulse { animation: iconPulse 0.5s ease; }
+@keyframes iconPulse { 0% { transform: translateZ(40px) scale(1); } 50% { transform: translateZ(50px) scale(1.3); filter: drop-shadow(0 0 25px #d1b200); } 100% { transform: translateZ(40px) scale(1); } }
+
+/* =====================================================================
+   RESPONSIVE SCALING FOR BUBBLES
+===================================================================== */
+@media (min-width: 768px) and (max-width: 991px) {
+    .tm-nav-link, .product__bg { width: 140px; height: 140px; }
+    .tm-nav-icon.front-face { font-size: 1.8em; margin-bottom: 20px; }
+    .tm-nav-icon.back-face { top: 25px; font-size: 1.8em; }
+}
+
+@media (max-width: 767px) {
+    .tm-nav-link, .product__bg { width: 110px !important; height: 110px !important; }
+    .tm-nav-icon.front-face { font-size: 1.5em; margin-bottom: 15px; }
+    .tm-nav-text.front-face { font-size: 12px; bottom: 10px; }
+    .tm-nav-icon.back-face { top: 20px; font-size: 1.5em; margin: 0 !important; }
+    .tm-nav-text.back-face { font-size: 12px; bottom: 10px; }
+    .pl__bubble { font-size: 30px; }
+}
+
+
+/* =====================================================================
+   PS VITA PEEL LOCK SCREEN
+===================================================================== */
+#vita-lock-screen {
+    position: fixed; inset: 0; z-index: 999998;
+    background: url('../img/img-bg2.jpeg') center/cover no-repeat; 
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); 
+    touch-action: none; cursor: grab;
+}
+#vita-lock-screen:active { cursor: grabbing; }
+
+.vita-border { position: absolute; inset: 15px; border: 2px solid rgba(255,255,255,0.7); border-radius: 25px; pointer-events: none; }
+
+#vita-flap {
+    position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 999999; background: #0078d7; 
+    clip-path: polygon(100% 0%, 100% 0%, 100% 0%); filter: drop-shadow(-10px 10px 25px rgba(0,0,0,0.6)); pointer-events: none;
+}
+
+.vita-clock { position: absolute; bottom: 40px; left: 40px; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.8); pointer-events: none; }
+.vita-clock #vita-time { font-size: 6rem; font-weight: 300; line-height: 1; letter-spacing: -2px; }
+.vita-clock #vita-date { font-size: 1.5rem; font-weight: 400; margin-top: 10px; color: #f0f0f0; }
+
+.peel-indicator {
+    position: absolute; top: 25px; right: 25px; color: white; font-size: 2rem;
+    animation: peelBounce 1.5s infinite; pointer-events: none;
+}
+@keyframes peelBounce { 0% { transform: translate(0, 0); opacity: 1; } 50% { transform: translate(-10px, 10px); opacity: 0.5; } 100% { transform: translate(0, 0); opacity: 1; } }
+
+/* =====================================================================
+   GLOBAL FIXED MODAL ENGINE 
+===================================================================== */
+.product__description { display: none; } 
+
+.details {
+    position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important;
+    z-index: 99999 !important; display: none; overflow-y: auto !important; overflow-x: hidden !important; background-color: rgba(0, 0, 0, 0.85); 
+    -ms-overflow-style: none !important; scrollbar-width: none !important;
+}
+.details::-webkit-scrollbar { display: none !important; }
+
+.details__bg { 
+    position: relative !important; margin: 60px auto !important; width: 90% !important; max-width: 900px !important; min-height: 200px;
+    background: #2c2a35; padding: 50px; transform-origin: 0 0 !important; 
+}
+
+.details__close {
+    position: fixed !important; top: 25px !important; right: 25px !important; z-index: 100000 !important; color: #D1B200 !important;
+    background: rgba(0, 0, 0, 0.7) !important; border: 2px solid #D1B200 !important; border-radius: 50% !important; width: 50px !important; height: 50px !important;
+    display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer; transition: transform 0.2s ease;
+}
+.details__close:hover { transform: scale(1.2); background: #D1B200 !important; color: #000 !important; }
+
+/* =====================================================================
+   NATIVE CSS SCROLL-SNAP GALLERY
+===================================================================== */
+.tm-img-slider { display: flex; gap: 15px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 15px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #D1B200 #111; }
+.tm-slider-img-link { flex: 0 0 calc(25% - 11.25px); scroll-snap-align: start; border: 2px solid transparent; transition: border-color 0.3s ease, transform 0.3s ease; }
+.tm-slider-img-link:hover { border-color: #D1B200; transform: translateY(-5px); }
+.tm-img-slider::-webkit-scrollbar { height: 8px; }
+.tm-img-slider::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
+.tm-img-slider::-webkit-scrollbar-thumb { background: #D1B200; border-radius: 4px; }
+@media (max-width: 767px) { .tm-slider-img-link { flex: 0 0 calc(50% - 7.5px); } }

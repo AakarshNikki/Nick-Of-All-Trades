@@ -1,0 +1,25 @@
+.box-container {
+  position: relative;
+  display: inline-block;
+}
+
+.box-container::before,
+.box-container::after {
+  content: '';
+  position: absolute;
+  width: 20px; height: 20px;
+  background: #000; /* Border color */
+  z-index: -1;
+}
+
+.box-container::before {
+  top: 0; left: 0;
+  transform: rotate(45deg) translate(-10px, -10px);
+  transform-origin: top left;
+}
+
+.box-container::after {
+  bottom: 0; right: 0;
+  transform: rotate(45deg) translate(10px, 10px);
+  transform-origin: bottom right;
+}
