@@ -25,7 +25,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 2.5rem;
+  font-size: 2.0rem;
 }
 
 #tm-bg {
@@ -71,7 +71,6 @@ p {
   flex-direction: column;
   justify-content: space-between; 
   align-items: center;
-  /* Reduced top padding so flexbox can perfectly center the content */
   padding: 20px 15px; 
   position: absolute;
   left: 0;
@@ -86,7 +85,6 @@ p {
   align-items: center;
   justify-content: center;
   width: 100%;
-  /* These auto margins are the secret to vertical centering! */
   margin-top: auto;   
   margin-bottom: auto;
 }
@@ -217,18 +215,15 @@ a, button { transition: all 0.3s ease; }
 a:hover, a:focus { text-decoration: none; outline: none; }
 p:last-child { margin-bottom: 0; }
 
-/* =====================================================================
-   RESPONSIVE DESIGN (TABLET & MOBILE)
-===================================================================== */
 @media (min-width: 992px) { 
   .container { max-width: 1140px; } 
 }
 
-/* Tablet Portrait & Large Phones */
 @media (max-width: 991px) {
   .tm-main-content { justify-content: center; }
-  /* Ensures auto margins are respected for true vertical centering */
   .tm-site-header-container { margin-top: auto !important; margin-bottom: auto !important; }
+  /* Forced 2x2 Grid on Tablet by restricting max-width */
+  .grid { justify-content: center; max-width: 380px; margin: 0 auto; } 
   .grid__item { margin: 10px; }
   .tm-site-header h1 { font-size: 2.2rem; margin-bottom: 10px !important; }
   .tm-site-header img { margin-bottom: 15px !important; max-height: 25px; }
@@ -236,18 +231,12 @@ p:last-child { margin-bottom: 0; }
   footer { margin-bottom: 20px !important; padding-top: 10px; }
 }
 
-/* Phones */
 @media (max-width: 767px) {
   .container { max-width: 100%; padding: 0 10px; }
-  
-  /* Restricts grid container to strictly force a 2x2 layout on mobile */
   .grid { justify-content: center; max-width: 320px; margin: 0 auto; } 
   .grid__item { margin: 6px; }
-  
   .tm-col-email { padding-left: 15px; }
   .tm-reverse-sm { flex-direction: column-reverse; }
-  
-  /* Shrink Header elements to fit screen */
   .tm-site-header { margin: 0; }
   .tm-site-header h1 { font-size: 1.8rem; margin-bottom: 5px !important; }
   .tm-site-header img { margin-bottom: 10px !important; height: 15px; }

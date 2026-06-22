@@ -65,10 +65,16 @@ html:not(.js-ready) .tm-main-content { transform: scale(1.05); filter: blur(5px)
     width: 165px; height: 165px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center;
 }
 
-.tm-nav-icon, .tm-nav-text { transform: translateZ(20px); text-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: transform 0.5s ease, filter 0.4s ease; }
+.tm-nav-icon, .tm-nav-text { 
+    transform: translateZ(20px); 
+    text-shadow: 0 4px 10px rgba(0,0,0,0.6); 
+    transition: transform 0.5s ease, filter 0.4s ease; 
+    -webkit-backface-visibility: hidden; /* Added to stop bleed-through */
+    backface-visibility: hidden;         /* Added to stop bleed-through */
+}
 
 .tm-nav-icon.front-face { display: block; color: #D1B200; margin-bottom: 25px; transform: translateZ(40px); text-shadow: 0 5px 15px rgba(0,0,0,0.9); }
-.tm-nav-text.front-face { position: absolute; color: #D1B200; left: 0; right: 0; bottom: 15px; text-align: center; transform: translateZ(30px); font-size: 15px; font-weight: bold; }
+.tm-nav-text.front-face { position: absolute; color: #D1B200; left: 0; right: 0; bottom: 15px; text-align: center; transform: translateZ(30px); font-size: 14px; font-weight: bold; }
 
 .tm-nav-icon.back-face {
     position: absolute; top: 35px; margin: 0 !important;
@@ -78,7 +84,14 @@ html:not(.js-ready) .tm-main-content { transform: scale(1.05); filter: blur(5px)
 .tm-nav-text.back-face {
     position: absolute; color: #D1B200; left: 0; right: 0; bottom: 15px; text-align: center;
     font-weight: bold; transform: rotateY(180deg) translateZ(30px);
-    filter: brightness(0.6); font-size: 15px;
+    filter: brightness(0.6); font-size: 14px;
+}
+
+@media (min-width: 767px) and (max-width: 991px), (max-width: 440px) {
+    .tm-nav-link, .product__bg { width: 145px; height: 145px; }
+}
+@media (max-width: 419px) {
+    .tm-nav-link, .product__bg { width: 120px !important; height: 120px !important; }
 }
 
 .product.is-locked .tm-nav-link { border-color: transparent !important; background: transparent !important; box-shadow: none !important; }
@@ -106,7 +119,6 @@ html:not(.js-ready) .tm-main-content { transform: scale(1.05); filter: blur(5px)
     .tm-nav-text.back-face { font-size: 12px; bottom: 10px; }
     .pl__bubble { font-size: 30px; }
 }
-
 
 /* =====================================================================
    PS VITA PEEL LOCK SCREEN
@@ -170,3 +182,69 @@ html:not(.js-ready) .tm-main-content { transform: scale(1.05); filter: blur(5px)
 .tm-img-slider::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
 .tm-img-slider::-webkit-scrollbar-thumb { background: #D1B200; border-radius: 4px; }
 @media (max-width: 767px) { .tm-slider-img-link { flex: 0 0 calc(50% - 7.5px); } }
+
+/* =====================================================================
+   WHATSAPP 3D CAPSULE BUTTON
+===================================================================== */
+.wa-capsule-wrapper {
+    perspective: 1000px;
+    display: inline-block;
+    cursor: pointer;
+    text-decoration: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.wa-capsule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 25px;
+    border-radius: 30px;
+    
+    background: 
+        radial-gradient(ellipse at 50% 5%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 40%),
+        radial-gradient(circle at 30% 30%, #25D366, #075E54 70%, #000);
+        
+    box-shadow: inset -5px -5px 15px rgba(0,0,0,0.8), inset 5px 5px 15px rgba(255,255,255,0.2), 0 10px 20px rgba(0,0,0,0.5), 0 0 15px rgba(37, 211, 102, 0.4);
+    border: 1px solid rgba(37, 211, 102, 0.4);
+    
+    transform-style: preserve-3d;
+    transition: filter 0.3s ease;
+}
+
+.wa-capsule i {
+    color: #ffffff;
+    transform: translateZ(20px);
+    text-shadow: 0 3px 8px rgba(0,0,0,0.7);
+    font-size: 1.3rem;
+    pointer-events: none;
+}
+
+.wa-capsule span {
+    color: #ffffff;
+    transform: translateZ(20px);
+    text-shadow: 0 3px 8px rgba(0,0,0,0.7);
+    font-weight: bold;
+    font-family: "Courbe Sans", sans-serif;
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+@media (max-width: 450px) {
+    .wa-capsule { padding: 8px 18px; gap: 8px; }
+    .wa-capsule i { font-size: 1.1rem; }
+    .wa-capsule span { font-size: 0.95rem; }
+}
+
+@media (max-width: 991px) {
+    .wa-capsule {
+        animation: waMobilePulse 2s infinite ease-in-out;
+    }
+}
+
+@keyframes waMobilePulse {
+    0% { box-shadow: inset -5px -5px 15px rgba(0,0,0,0.8), inset 5px 5px 15px rgba(255,255,255,0.2), 0 10px 20px rgba(0,0,0,0.5), 0 0 10px rgba(37, 211, 102, 0.4); filter: brightness(1); }
+    50% { box-shadow: inset -5px -5px 15px rgba(0,0,0,0.8), inset 5px 5px 15px rgba(255,255,255,0.2), 0 10px 20px rgba(0,0,0,0.5), 0 0 30px rgba(37, 211, 102, 0.9); filter: brightness(1.15); }
+    100% { box-shadow: inset -5px -5px 15px rgba(0,0,0,0.8), inset 5px 5px 15px rgba(255,255,255,0.2), 0 10px 20px rgba(0,0,0,0.5), 0 0 10px rgba(37, 211, 102, 0.4); filter: brightness(1); }
+}
