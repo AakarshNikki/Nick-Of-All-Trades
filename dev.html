@@ -4,12 +4,81 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Nick Of All Trades</title>
+    <title>Nick Of All Trades | Web OS</title>
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300"> 
     <link rel="stylesheet" href="css/bootstrap.min.css">                                                 
     <link rel="stylesheet" href="css/style.css">      
     <link rel="stylesheet" href="css/custom.css">                            
+
+    <style>
+        /* Developer: Games Library UI */
+        .os-game-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .os-game-card:hover {
+            background: rgba(209, 178, 0, 0.15);
+            border-color: #D1B200;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .os-game-thumb {
+            width: 100%;
+            height: 140px;
+            background: #111;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .os-tag {
+            background: #D1B200;
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 20px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        /* Consultant: Enterprise Terminal UI */
+        .os-terminal-view {
+            background: #0a0a0f;
+            border: 1px solid #00ffcc;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #00ffcc;
+            padding: 25px;
+            box-shadow: inset 0 0 20px rgba(0, 255, 204, 0.1);
+            position: relative;
+        }
+        .os-terminal-view::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 204, 0.05) 2px, rgba(0, 255, 204, 0.05) 4px);
+            pointer-events: none;
+            border-radius: 8px;
+        }
+        .term-header { border-bottom: 1px solid rgba(0, 255, 204, 0.3); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; }
+        .term-text { color: #ccc; font-family: 'Open Sans', sans-serif; font-size: 0.95rem; line-height: 1.6; }
+        .term-accent { color: #fff; background: rgba(0, 255, 204, 0.2); padding: 2px 6px; border-radius: 3px; }
+        .blink-cursor { animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    </style>
 
     <script>document.documentElement.className="js";var supportsCssVars=function(){var e,t=document.createElement("style");return t.innerHTML="root: { --tmp-var: bold; }",document.head.appendChild(t),e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),t.parentNode.removeChild(t),e};supportsCssVars()||alert("Please view this in a modern browser such as latest version of Chrome or Microsoft Edge.");</script>
 </head>
@@ -52,8 +121,6 @@
                                             <div class="pl__bubble">
                                                 <div class="pl__bubble-drop"></div><div class="pl__bubble-drop"></div>
                                                 <div class="pl__bubble-drop"></div><div class="pl__bubble-drop"></div>
-                                                <div class="pl__bubble-drop"></div><div class="pl__bubble-drop"></div>
-                                                <div class="pl__bubble-drop"></div><div class="pl__bubble-drop"></div>
                                             </div>
                                             <svg class="tm-nav-icon needs-space front-face" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#d1b200"><path d="M240-280 40-480l200-200 56 56-143 144 143 144-56 56Zm178 132-76-24 200-640 76 24-200 640Zm302-132-56-56 143-144-143-144 56-56 200 200-200 200Z"/></svg>
                                             <span class="tm-nav-text front-face">Developer</span>
@@ -63,21 +130,69 @@
                                         <div class="product__bg"></div>        
                                         
                                         <div class="product__description">
-                                            <div class="row mb-3">
-                                                <div class="col-12"><h2 class="tm-page-title">Hi I am Aakarsh</h2></div>
-                                            </div>                                        
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
-                                                    <img src="img/dev_img.jpg" class="img-fluid mb-3">
-                                                    <p>My trajectory in software development is defined by a deep-seated curiosity that predates the modern smartphone. From the early days of Java ME and the technical challenge of porting N-Gage titles to standard Nokia handsets, I have spent over a decade evolving alongside the mobile and gaming industries.<br><br>The Technical Evolution<br><br>I spent years refining my craft within the Android ecosystem (Jellybean through KitKat) before transitioning into high-level game architecture. While I built a deep mastery of Unity (C#) and Unreal Engine (C++), my professional focus underwent a significant shift following the Unity-ironSource merger. Disillusioned by the industry's pivot toward aggressive monetization over developer-centric stability, I made the strategic and ethical choice to transition my primary development to the Godot Engine, advocating for the transparency and resilience of open-source tools. </p>
-                                                </div>
-                                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
-                                                    <p>Today, my work is driven by the conviction that technology must serve the public good. I bridge the gap between complex logic and human impact through three core pillars:<br><br>Educational Innovation: I am currently gamifying high school science concepts, transforming rigid curricula into immersive, interactive learning environments.<br><br>Narrative Design: Utilizing my background in creative writing and poetry to build games where the story is as robust as the codebase.<br><br>AI & Tech Ethics: I serve as an active voice for the ethical use of Artificial Intelligence. I advocate for transparency, data privacy, and the protection of human creativity against the unchecked expansion of automated systems.<br><br>I believe that as developers, we are the architects of the digital future, and it is our responsibility to ensure that future is built on ethical foundations.</p>
-                                                    <img src="img/ethics.jpg" class="img-fluid mt-3 mb-4">
-                                                    
-                                                    <a href="dual-boot.html" class="btn tm-btn-gray"><i style="margin-right: 0.5rem; display: inline-flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512" fill="currentColor"><path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0-105.4 105.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg></i> Read More</a>
-                                                    
+                                            <div class="os-library-view p-sm-4 p-2">
+                                                <div class="row mb-4">
+                                                    <div class="col-12">
+                                                        <h2 class="tm-page-title m-0">Interactive Portfolio</h2>
+                                                        <p class="mt-2">Over 12 years of development experience, culminating in specialized architecture using Godot and Unity. Select an experience below to launch the web-export directly in your browser.</p>
+                                                    </div>
                                                 </div>                                        
+                                                
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-4 mb-4">
+                                                        <div class="os-game-card" data-game-title="Procedural Platformer" data-game-url="about:blank">
+                                                            <div class="os-game-thumb">
+                                                                <img src="img/gallery-img-01-tn.jpg" class="img-fluid" style="opacity: 0.6;">
+                                                                <span class="os-tag">Godot</span>
+                                                            </div>
+                                                            <h5 class="text-white mb-1">Procedural Jump</h5>
+                                                            <p class="small text-muted mb-3 flex-grow-1">2D side-scrolling platformer featuring procedural level generation and custom sprite sheet animation.</p>
+                                                            <button class="btn tm-btn-gray btn-sm w-100"><i class="fa-solid fa-play"></i> Launch App</button>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="col-sm-12 col-md-4 mb-4">
+                                                        <div class="os-game-card" data-game-title="RL Agent Arena" data-game-url="about:blank">
+                                                            <div class="os-game-thumb">
+                                                                <img src="img/gallery-img-02-tn.jpg" class="img-fluid" style="opacity: 0.6;">
+                                                                <span class="os-tag">Python/AI</span>
+                                                            </div>
+                                                            <h5 class="text-white mb-1">RL Agent Arena</h5>
+                                                            <p class="small text-muted mb-3 flex-grow-1">A visual representation of reinforcement learning models trained alongside peers in a simulated environment.</p>
+                                                            <button class="btn tm-btn-gray btn-sm w-100"><i class="fa-solid fa-play"></i> Launch App</button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-12 col-md-4 mb-4">
+                                                        <div class="os-game-card" data-game-title="3D Animation Slider" data-game-url="about:blank">
+                                                            <div class="os-game-thumb">
+                                                                <img src="img/gallery-img-03-tn.jpg" class="img-fluid" style="opacity: 0.6;">
+                                                                <span class="os-tag">Unity</span>
+                                                            </div>
+                                                            <h5 class="text-white mb-1">3D Slider Tech</h5>
+                                                            <p class="small text-muted mb-3 flex-grow-1">A mechanics showcase demonstrating advanced 3D slider effects and high-level architectural design.</p>
+                                                            <button class="btn tm-btn-gray btn-sm w-100"><i class="fa-solid fa-play"></i> Launch App</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="os-theater-view p-sm-4 p-2" style="display: none;">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h3 class="tm-page-title m-0" id="theater-title">Now Playing</h3>
+                                                    <button class="btn btn-outline-danger btn-sm os-close-game" style="font-family: 'Courbe Sans', sans-serif;">
+                                                        <i style="display:inline-flex; align-items:center; margin-right: 5px;"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></i> Exit to Library
+                                                    </button>
+                                                </div>
+                                                
+                                                <div style="position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 8px; border: 2px solid #D1B200; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+                                                    <div style="position: absolute; top:0; left:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#444;">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#444"><path d="M240-280 40-480l200-200 56 56-143 144 143 144-56 56Zm178 132-76-24 200-640 76 24-200 640Zm302-132-56-56 143-144-143-144 56-56 200 200-200 200Z"/></svg>
+                                                        <p class="mt-3">WebAssembly / HTML5 Canvas Loading...</p>
+                                                    </div>
+                                                    <iframe id="theater-frame" src="" style="position: absolute; top:0; left:0; width:100%; height:100%; border:none; z-index: 2;"></iframe>
+                                                </div>
+                                                <p class="text-center mt-3 text-muted small">Gamepad API Supported. Touch controls overlay automatically on mobile devices.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -99,21 +214,34 @@
 
                                         <div class="product__description">
                                             <div class="p-sm-4 p-2">
-                                                <div class="row mb-3">
-                                                    <div class="col-12"><h2 class="tm-page-title">As A Consultant</h2></div>
-                                                </div>
-                                                <div class="row tm-reverse-sm">
-                                                    <div class="col-sm-12 col-md-8 col-lg-8 col-xl-8">
-                                                        <p class="mb-4">I empower startups and small enterprises to scale effectively by replacing traditional, high-cost marketing and advertising models with strategic and ethical AI integration.<br><br>In an era of rising digital costs and data vulnerability, I specialize in implementing Privacy-First, Offline AI solutions. My approach ensures that businesses can automate their growth and marketing workflows at a fraction of the usual cost, without ever compromising their most valuable asset: customer data.</p>
-                                                        <ul> 
-                                                            <li><p class="mb-4"><strong class="font-weight-bold">Efficiency through Local AI:</strong> I guide companies in deploying local, open-source Large Language Models (LLMs) and tools that run on existing hardware. This eliminates expensive monthly subscriptions and reduces dependence on third-party advertising platforms.</p></li> 
-                                                            <li><p class="mb-4"><strong class="font-weight-bold">Data Sovereignty & Privacy:</strong>  By keeping AI operations offline, I ensure that sensitive customer information stays within the company’s walls. This is not just a security measure; it is a commitment to the ethical use of technology.</p></li>
-                                                            <li><p class="mb-4"><strong class="font-weight-bold">Marketing Integration:</strong>  I help startups build sustainable brand presence using AI-driven content and strategy that respects the user, avoiding the invasive tracking typical of modern digital marketing.</p></li>                                                      
-                                                        </ul>  
-                                                        <a href="dual-boot.html" class="btn tm-btn-gray mt-4"><i style="margin-right: 0.5rem; display: inline-flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512" fill="currentColor"><path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0-105.4 105.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg></i> Know More</a>        
-                                                    </div>                                                
-                                                    <div class="col-sm-12 col-md-4 col-lg-4 col-xl-4 mb-lg-0 mb-sm-4 mb-4">
-                                                        <img src="img/consultant.jpg" class="img-fluid">
+                                                <div class="os-terminal-view">
+                                                    <div class="term-header">
+                                                        <span>root@mente-fabrica:~/consulting</span>
+                                                        <span>[STATUS: SECURE_CONNECTION]</span>
+                                                    </div>
+                                                    
+                                                    <p class="mb-2">> INITIALIZING ENTERPRISE PROTOCOLS...</p>
+                                                    <p class="mb-4">> LOADING CORE COMPETENCIES <span class="blink-cursor">_</span></p>
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-sm-12 col-md-7">
+                                                            <ul class="list-unstyled">
+                                                                <li class="mb-3"><span class="term-accent">[MODULE_01]</span> <span class="text-white">Privacy-First Local AI</span><br><span class="term-text">Deploying open-source LLMs (CodeQwen, Ollama) on dedicated workstations. Eliminates monthly subscription overhead and ensures sensitive customer data never leaves your hardware.</span></li>
+                                                                
+                                                                <li class="mb-3"><span class="term-accent">[MODULE_02]</span> <span class="text-white">Revenue Cycle Mgmt (RCM)</span><br><span class="term-text">Establishing Knowledge Process Outsourcing (KPO) pipelines optimized for US-based clients, leveraging local AI to automate workflows efficiently.</span></li>
+                                                                
+                                                                <li class="mb-3"><span class="term-accent">[MODULE_03]</span> <span class="text-white">Strategic Education</span><br><span class="term-text">Providing free computer practical revisions and technology syllabi to empower the next generation of engineers.</span></li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-5">
+                                                            <div class="p-3" style="border: 1px dashed rgba(0, 255, 204, 0.4); border-radius: 5px;">
+                                                                <p class="text-white mb-2">> EXECUTIVE_SUMMARY.TXT</p>
+                                                                <p class="term-text small mb-0">In an era of rising digital costs and data vulnerability, I replace traditional advertising models with ethical AI integration. My approach ensures businesses can automate their growth at a fraction of the usual cost, without compromising their most valuable asset: data sovereignty.</p>
+                                                            </div>
+                                                            <a href="#" class="btn w-100 mt-3" style="background: rgba(0, 255, 204, 0.1); border: 1px solid #00ffcc; color: #00ffcc; font-family: 'Courbe Sans', sans-serif;">
+                                                                > EXECUTE DISCOVERY_CALL
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -150,7 +278,7 @@
                                                     <div class="col-12">
                                                         <p>As a firm believer that <strong class="font-weight-bold h5 text-white">Change is the only constant,</strong> I am convinced that when humans are presented with profound, thought-provoking knowledge, they possess the innate ability and will to change for the better.<br><br>As an author and creator, my mission is to craft narrative experiences and poetic works that challenge assumptions and ignite the intellect. I design my creations not just to entertain, but to make you pause, question, and think.<br><br>If you are curious to explore deeper, click on any image below to read one of my creations..</p>
                                                         
-                                                        <a href="#" class="btn tm-btn-gray mt-3"><i style="margin-right: 0.5rem; display: inline-flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M560-564v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-600q-38 0-73 9.5T560-564Zm0 220v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-380q-38 0-73 9t-67 27Zm0-110v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-490q-38 0-73 9.5T560-454ZM260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z"/></svg></i> Know More</a>
+                                                        <a href="#" class="btn tm-btn-gray mt-3"><i style="margin-right: 0.5rem; display: inline-flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M560-564v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-600q-38 0-73 9.5T560-564Zm0 220v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-380q-38 0-73 9t-67 27Zm0-110v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-490q-38 0-73 9.5T560-454ZM260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z"/></svg></i> Read More</a>
                                                         
                                                     </div>
                                                 </div>
@@ -404,8 +532,54 @@
             });
 
             // ==========================================
-            // WHATSAPP CAPSULE - EVENT DELEGATION
+            // EVENT DELEGATION: OS GAME LAUNCHER & WHATSAPP
             // ==========================================
+            document.addEventListener("click", (e) => {
+                // Game Launcher Logic
+                const gameCard = e.target.closest(".os-game-card");
+                if (gameCard) {
+                    const url = gameCard.dataset.gameUrl;
+                    const title = gameCard.dataset.gameTitle;
+                    
+                    // We must find the specific elements WITHIN the active open modal (which main.js moves to .details__bg)
+                    const activeModal = document.querySelector('.details__bg');
+                    if(activeModal) {
+                        const libraryView = activeModal.querySelector(".os-library-view");
+                        const theaterView = activeModal.querySelector(".os-theater-view");
+                        const frame = theaterView.querySelector("#theater-frame");
+                        const titleEl = theaterView.querySelector("#theater-title");
+
+                        titleEl.innerText = "Playing: " + title;
+                        frame.src = url;
+                        
+                        gsap.to(libraryView, { opacity: 0, duration: 0.3, onComplete: () => {
+                            libraryView.style.display = "none";
+                            theaterView.style.display = "block";
+                            gsap.fromTo(theaterView, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.4 });
+                        }});
+                    }
+                }
+
+                // Game Closer Logic
+                const closeBtn = e.target.closest(".os-close-game");
+                if (closeBtn) {
+                    const activeModal = document.querySelector('.details__bg');
+                    if(activeModal) {
+                        const theaterView = activeModal.querySelector(".os-theater-view");
+                        const libraryView = activeModal.querySelector(".os-library-view");
+                        const frame = theaterView.querySelector("#theater-frame");
+
+                        gsap.to(theaterView, { opacity: 0, scale: 0.95, duration: 0.3, onComplete: () => {
+                            theaterView.style.display = "none";
+                            frame.src = ""; // Shut down the game engine to save resources
+                            libraryView.style.display = "block";
+                            gsap.fromTo(libraryView, { opacity: 0 }, { opacity: 1, duration: 0.4 });
+                        }});
+                    }
+                }
+            });
+
+            // WhatsApp Hover Effects
             document.addEventListener("pointermove", (e) => {
                 const wrapper = e.target.closest(".wa-capsule-wrapper");
                 if (wrapper) {

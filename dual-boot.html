@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nick Of All Trades | Dual-Boot OS</title>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,700"> 
+
+    <style>
+        /* =========================================================
+           GLOBAL RESET & TYPOGRAPHY
+        ========================================================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100vw; height: 100vh; overflow: hidden;
+            background-color: #000; font-family: 'Open Sans', sans-serif;
+        }
+
+        /* =========================================================
+           DUAL-BOOT SPLIT CONTAINER
+        ========================================================= */
+        #split-container {
+            display: flex; width: 100vw; height: 100vh;
+        }
+
+        .split-side {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+        }
+
+        /* Darken the un-hovered side */
+        #split-container:hover .split-side { filter: brightness(0.4) grayscale(0.5); }
+        #split-container .split-side:hover { flex: 1.4; filter: brightness(1) grayscale(0); z-index: 10; }
+
+        /* Backgrounds & Textures */
+        .bg-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; transition: transform 0.6s ease;
+        }
+
+        .split-side:hover .bg-layer { transform: scale(1.05); }
+
+        .content-layer {
+            position: relative; z-index: 1;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 40px;
+        }
+
+        h2 { font-size: 3rem; font-weight: 700; letter-spacing: 2px; margin-top: 20px; text-transform: uppercase; }
+        p { font-size: 1.1rem; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; max-width: 400px; line-height: 1.6; }
+        .split-side:hover p { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+
+        /* =========================================================
+           LEFT SIDE: GAME DEVELOPER (Neon / Cyberpunk)
+        ========================================================= */
+        #side-dev .bg-layer {
+            background: radial-gradient(circle at center, #1a1a2e 0%, #050508 100%);
+        }
+        /* Grid overlay */
+        #side-dev .bg-layer::after {
+            content: ""; position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(0, 204, 255, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 204, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(500px) rotateX(60deg) translateY(100px) translateZ(-200px);
+            opacity: 0.5;
+        }
+
+        #side-dev h2 { color: #fff; text-shadow: 0 0 15px #00ccff, 0 0 30px #00ccff; }
+        #side-dev p { color: #00ccff; }
+        #side-dev svg { filter: drop-shadow(0 0 10px #00ccff); color: #00ccff; transition: transform 0.3s ease; }
+        #side-dev:hover svg { transform: scale(1.2) translateY(-10px); }
+
+        /* =========================================================
+           RIGHT SIDE: ENTERPRISE CONSULTANT (Minimalist / Gold)
+        ========================================================= */
+        #side-consult { border-left: 2px solid rgba(209, 178, 0, 0.3); }
+        #side-consult .bg-layer {
+            background: linear-gradient(135deg, #2c2a35 0%, #15141a 100%);
+        }
+
+        #side-consult h2 { color: #D1B200; }
+        #side-consult p { color: #e0e0e0; }
+        #side-consult svg { filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8)); color: #D1B200; transition: transform 0.3s ease; }
+        #side-consult:hover svg { transform: scale(1.2) translateY(-10px); }
+
+        /* =========================================================
+           BOOT SEQUENCE TERMINAL (Hidden by Default)
+        ========================================================= */
+        #boot-screen {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #050508; display: none;
+            flex-direction: column; justify-content: center; padding: 50px;
+            font-family: 'Courier New', Courier, monospace; color: #fff;
+        }
+        
+        .boot-line { font-size: 1.2rem; margin-bottom: 10px; opacity: 0; }
+        .color-dev { color: #00ccff; }
+        .color-consult { color: #D1B200; }
+        .blink { animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    </style>
+</head>
+<body>
+
+    <!-- THE DUAL BOOT CHOICES -->
+    <div id="split-container">
+        
+        <!-- GAME DEVELOPER SIDE -->
+        <div id="side-dev" class="split-side" onclick="initiateBoot('dev')">
+            <div class="bg-layer"></div>
+            <div class="content-layer">
+                <!-- INLINE SVG: Developer Brackets -->
+                <svg xmlns="http://www.w3.org/2000/svg" height="80px" viewBox="0 -960 960 960" width="80px" fill="currentColor"><path d="M240-280 40-480l200-200 56 56-143 144 143 144-56 56Zm178 132-76-24 200-640 76 24-200 640Zm302-132-56-56 143-144-143-144 56-56 200 200-200 200Z"/></svg>
+                <h2>Developer</h2>
+                <p>Initialize WebGL Engine. Access interactive HTML5 exports, narrative game design, and procedural logic algorithms.</p>
+            </div>
+        </div>
+
+        <!-- STRATEGIC CONSULTANT SIDE -->
+        <div id="side-consult" class="split-side" onclick="initiateBoot('consult')">
+            <div class="bg-layer"></div>
+            <div class="content-layer">
+                <!-- INLINE SVG: Consultant Chalkboard -->
+                <svg xmlns="http://www.w3.org/2000/svg" height="80px" width="80px" fill="currentColor" viewBox="0 0 640 640"><path d="M192 144C222.9 144 248 118.9 248 88C248 57.1 222.9 32 192 32C161.1 32 136 57.1 136 88C136 118.9 161.1 144 192 144zM176 576L176 416C176 407.2 183.2 400 192 400C200.8 400 208 407.2 208 416L208 576C208 593.7 222.3 608 240 608C257.7 608 272 593.7 272 576L272 240L400 240C417.7 240 432 225.7 432 208C432 190.3 417.7 176 400 176L384 176L384 128L576 128L576 320L384 320L384 288L320 288L320 336C320 362.5 341.5 384 368 384L592 384C618.5 384 640 362.5 640 336L640 112C640 85.5 618.5 64 592 64L368 64C341.5 64 320 85.5 320 112L320 176L197.3 176C151.7 176 108.8 197.6 81.7 234.2L14.3 324.9C3.8 339.1 6.7 359.1 20.9 369.7C35.1 380.3 55.1 377.3 65.7 363.1L112 300.7L112 576C112 593.7 126.3 608 144 608C161.7 608 176 593.7 176 576z"/></svg>
+                <h2>Consultant</h2>
+                <p>Deploy Enterprise Solutions. Access strategic integration of Privacy-First Local AI, scalable ROI models, and data sovereignty.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOOT SEQUENCE TAKEOVER -->
+    <div id="boot-screen">
+        <div id="terminal-output"></div>
+        <div class="mt-4"><span class="blink">_</span></div>
+    </div>
+
+    <!-- PURE GSAP FOR THE TAKEOVER ANIMATION -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+        // Custom Boot Texts for each persona
+        const bootSequences = {
+            dev: [
+                "NICK_OS [Version 2.0.26]",
+                "(c) Mente-Fabrica Corporation. All rights reserved.",
+                "",
+                "> Compiling WebAssembly Modules...",
+                "> Loading Godot Engine Canvas...",
+                "> Mounting Sprite Textures... [SUCCESS]",
+                "> Initializing Controller Input API...",
+                "",
+                "<span class='color-dev'>READY. LAUNCHING GAMES LIBRARY.</span>"
+            ],
+            consult: [
+                "ENTERPRISE TERMINAL [SECURE CONNECTION]",
+                "Establishing encrypted handshake...",
+                "",
+                "> Bypassing third-party data tracking...",
+                "> Deploying Local LLM on dedicated hardware...",
+                "> Verifying Data Sovereignty protocols... [CLEARED]",
+                "> Calculating scalable ROI workflows...",
+                "",
+                "<span class='color-consult'>ACCESS GRANTED. ENTERING STRATEGY DASHBOARD.</span>"
+            ]
+        };
+
+        function initiateBoot(type) {
+            const container = document.getElementById('split-container');
+            const clickedSide = document.getElementById(type === 'dev' ? 'side-dev' : 'side-consult');
+            const otherSide = document.getElementById(type === 'dev' ? 'side-consult' : 'side-dev');
+            const bootScreen = document.getElementById('boot-screen');
+            const termOutput = document.getElementById('terminal-output');
+
+            // 1. Lock the layout from further hover events
+            container.style.pointerEvents = "none";
+            
+            // 2. Hide content of both sides
+            gsap.to(".content-layer", { opacity: 0, duration: 0.3 });
+
+            // 3. The Takeover Animation
+            // The clicked side rapidly expands to 100% width, swallowing the screen
+            gsap.to(clickedSide, { flex: 100, duration: 0.8, ease: "power4.inOut" });
+            gsap.to(otherSide, { flex: 0, duration: 0.8, ease: "power4.inOut", onComplete: () => {
+                
+                // 4. Reveal Terminal
+                bootScreen.style.display = "flex";
+                container.style.display = "none";
+
+                // 5. Typewriter Boot Sequence
+                const lines = bootSequences[type];
+                let tl = gsap.timeline();
+
+                lines.forEach((line, index) => {
+                    const p = document.createElement('div');
+                    p.className = 'boot-line';
+                    p.innerHTML = line;
+                    termOutput.appendChild(p);
+                    
+                    // Add staggered fade-ins mimicking terminal loading
+                    let delay = line === "" ? 0.1 : Math.random() * 0.4 + 0.1;
+                    if(index === lines.length - 1) delay = 0.8; // Pause before final success message
+
+                    tl.to(p, { opacity: 1, duration: 0.1 }, `+=${delay}`);
+                });
+
+                // (In a real scenario, you would do window.location.href = "developer.html" after this finishes!)
+            }});
+        }
+    </script>
+</body>
+</html>
