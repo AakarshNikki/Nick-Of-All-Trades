@@ -44,7 +44,7 @@
            DUAL-BOOT SPLIT CONTAINER
         ========================================================= */
         #split-container {
-            display: flex; width: 100vw; height: 100vh;
+            display: flex; width: 100vw; height: 100vh; position: relative;
         }
 
         .split-side {
@@ -62,34 +62,43 @@
         h2 { font-size: 3rem; font-weight: 700; letter-spacing: 2px; margin-top: 20px; text-transform: uppercase; transition: text-shadow 0.4s ease, color 0.4s ease; }
         p.desc-text { font-size: 1.1rem; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; max-width: 400px; line-height: 1.6; margin-top: 15px; }
         
-        /* The "Click to continue" instruction */
+        /* "Click anywhere to continue" instruction */
         h4.continue-text {
             opacity: 0; margin-top: 30px; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase;
-            color: rgba(255,255,255,0.7); transition: opacity 0.4s ease;
+            color: rgba(255,255,255,0.8); transition: opacity 0.4s ease;
             animation: pulseText 1.5s infinite; pointer-events: none;
         }
-        @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        @keyframes pulseText { 0%, 100% { opacity: 0.3; filter: blur(1px); } 50% { opacity: 1; filter: blur(0px); } }
 
         /* Desktop Hover States */
         @media (min-width: 992px) {
             #split-container:hover .split-side { filter: brightness(0.4) grayscale(0.5); }
-            /* Expand to take up most of the screen on hover */
             #split-container .split-side:hover { flex: 5; filter: brightness(1) grayscale(0); z-index: 10; }
             .split-side:hover .bg-layer { transform: scale(1.05); }
             .split-side:hover p.desc-text { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
             .split-side:hover h4.continue-text { opacity: 1; transition-delay: 0.3s; }
         }
 
-        /* Mobile Gyroscope States (Controlled by JS Classes) */
+        /* Mobile Gyroscope States: Overlapping Cards Layout */
         @media (max-width: 991px) {
-            #split-container { flex-direction: row; }
-            /* On tilt, the active side takes over 100% of the flex space */
-            .split-side.mobile-focus { flex: 100; filter: brightness(1) grayscale(0); z-index: 10; }
-            .split-side.mobile-dim { flex: 0; opacity: 0; pointer-events: none; }
+            #split-container { display: block; } /* Remove flex so we can absolute position */
             
+            .split-side { 
+                position: absolute; top: 0; height: 100%; width: 50vw; 
+                transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease, z-index 0s;
+            }
+            #side-dev { left: 0; z-index: 5; transform-origin: left center; }
+            #side-consult { right: 0; z-index: 5; transform-origin: right center; }
+
+            /* ACTIVE STATE: Expands over the other card */
+            .split-side.mobile-focus { width: 100vw; z-index: 10; filter: brightness(1) grayscale(0); }
             .split-side.mobile-focus .bg-layer { transform: scale(1.05); }
             .split-side.mobile-focus p.desc-text { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
             .split-side.mobile-focus h4.continue-text { opacity: 1; transition-delay: 0.3s; }
+            
+            /* RECEDING STATE: The card sliding under */
+            #side-consult.mobile-dim { transform: scale(0.92) translateX(10%); filter: brightness(0.3) grayscale(0.8); z-index: 1; pointer-events: none; }
+            #side-dev.mobile-dim { transform: scale(0.92) translateX(-10%); filter: brightness(0.3) grayscale(0.8); z-index: 1; pointer-events: none; }
             
             h2 { font-size: 1.8rem !important; }
             p.desc-text { font-size: 0.9rem !important; padding: 0 15px; }
@@ -106,10 +115,10 @@
             background-size: 40px 40px; transform: perspective(500px) rotateX(60deg) translateY(100px) translateZ(-200px); opacity: 0.5;
         }
         
-        /* Base state (Off) */
+        /* Base state */
         #side-dev h2 { color: #00ccff; text-shadow: none; }
         #side-dev p.desc-text { color: #00ccff; }
-        #side-dev svg { color: #00ccff; filter: none; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease; }
+        #side-dev svg { color: #00ccff; filter: none; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease, color 0.4s ease; }
 
         /* Ignited state (Hover/Tilt) */
         #side-dev:hover h2, #side-dev.mobile-focus h2 { color: #fff; text-shadow: 0 0 15px #00ccff, 0 0 30px #00ccff; }
@@ -121,10 +130,10 @@
         #side-consult { border-left: 2px solid rgba(209, 178, 0, 0.3); }
         #side-consult .bg-layer { background: linear-gradient(135deg, #2c2a35 0%, #15141a 100%); }
         
-        /* Base state (Off) */
+        /* Base state */
         #side-consult h2 { color: #D1B200; text-shadow: none; }
         #side-consult p.desc-text { color: #e0e0e0; }
-        #side-consult svg { color: #D1B200; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease; }
+        #side-consult svg { color: #D1B200; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease, color 0.4s ease; }
 
         /* Ignited state (Hover/Tilt) */
         #side-consult:hover h2, #side-consult.mobile-focus h2 { color: #fff; text-shadow: 0 0 15px #D1B200, 0 0 30px #D1B200; }
@@ -242,13 +251,13 @@
             let gamma = e.gamma; // Left-to-Right Tilt
 
             if (gamma < -15) {
-                // Tilted Left: Developer side takes over 100% of the screen
+                // Tilted Left: Developer side slides OVER Consultant
                 devSide.classList.add('mobile-focus');
                 devSide.classList.remove('mobile-dim');
                 consultSide.classList.add('mobile-dim');
                 consultSide.classList.remove('mobile-focus');
             } else if (gamma > 15) {
-                // Tilted Right: Consultant side takes over 100% of the screen
+                // Tilted Right: Consultant side slides OVER Developer
                 consultSide.classList.add('mobile-focus');
                 consultSide.classList.remove('mobile-dim');
                 devSide.classList.add('mobile-dim');
@@ -289,11 +298,16 @@
         };
 
         function initiateBoot(type) {
+            // Only boot if the user is on desktop OR if the side has expanded on mobile
+            const clickedSide = document.getElementById(type === 'dev' ? 'side-dev' : 'side-consult');
+            if (window.innerWidth <= 991 && !clickedSide.classList.contains('mobile-focus')) {
+                return; // Ignore clicks on the un-expanded side
+            }
+
             if (isBooting) return;
             isBooting = true;
 
             const container = document.getElementById('split-container');
-            const clickedSide = document.getElementById(type === 'dev' ? 'side-dev' : 'side-consult');
             const otherSide = document.getElementById(type === 'dev' ? 'side-consult' : 'side-dev');
             const bootScreen = document.getElementById('boot-screen');
             const termOutput = document.getElementById('terminal-output');
@@ -304,10 +318,17 @@
             // Fade out internal text rapidly
             gsap.to(".content-layer", { opacity: 0, duration: 0.3 });
 
-            // Swallow the screen with the chosen side
-            gsap.to(clickedSide, { flex: 100, duration: 0.8, ease: "power4.inOut" });
-            gsap.to(otherSide, { flex: 0, duration: 0.8, ease: "power4.inOut", onComplete: () => {
-                
+            // Swallow the screen with the chosen side (Desktop vs Mobile logic)
+            if (window.innerWidth > 991) {
+                gsap.to(clickedSide, { flex: 100, duration: 0.8, ease: "power4.inOut" });
+                gsap.to(otherSide, { flex: 0, duration: 0.8, ease: "power4.inOut", onComplete: startTerminal });
+            } else {
+                clickedSide.style.zIndex = "20";
+                gsap.to(clickedSide, { width: "100vw", duration: 0.8, ease: "power4.inOut" });
+                gsap.to(otherSide, { scale: 0.8, opacity: 0, duration: 0.8, ease: "power4.inOut", onComplete: startTerminal });
+            }
+
+            function startTerminal() {
                 // Show Terminal
                 bootScreen.style.display = "flex";
                 container.style.display = "none";
@@ -329,8 +350,8 @@
                 });
 
                 // tl.call(() => { window.location.href = type === 'dev' ? 'developer.html' : 'consultant.html'; }, null, "+=1.5");
-            }});
+            }
         }
     </script>
 </body>
-</html> 
+</html>
