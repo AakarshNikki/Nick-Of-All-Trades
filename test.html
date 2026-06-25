@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pixel Effect</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        // This path must match your folder structure: img/dev_img.jpg
+        img.src = 'img/dev_img.jpg';
+
+        img.onload = function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Draw image to a hidden canvas to get pixel data
+            const tempCanvas = document.createElement('canvas');
+            const tCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = 100; // Resolution of the pixel grid
+            tempCanvas.height = 100;
+            tCtx.drawImage(img, 0, 0, 100, 100);
+            const imageData = tCtx.getImageData(0, 0, 100, 100).data;
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const size = canvas.width / 100;
+                
+                for (let i = 0; i < 10000; i++) {
+                    const r = imageData[i * 4];
+                    const g = imageData[i * 4 + 1];
+                    const b = imageData[i * 4 + 2];
+                    
+                    ctx.fillStyle = `rgb(${r},${g},${b})`;
+                    
+                    const x = (i % 100) * size;
+                    const y = Math.floor(i / 100) * size;
+                    
+                    // Simple hover effect
+                    ctx.fillRect(x, y, size - 1, size - 1);
+                }
+            }
+            draw();
+        };
+
+        img.onerror = function() {
+            console.error("Image failed to load! Check the path: img/dev_img.jpg");
+            // Draw a placeholder red box so you know the script is running
+            ctx.fillStyle = 'red';
+            ctx.fillRect(100, 100, 200, 200);
+        };
+    </script>
+</body>
+</html>

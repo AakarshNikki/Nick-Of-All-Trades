@@ -57,12 +57,11 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 0; transition: transform 0.6s ease;
         }
-        .content-layer { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding: 40px; width: 100%; }
+        .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; padding: 40px; width: 100%; }
         
         h2 { font-size: 3rem; font-weight: 700; letter-spacing: 2px; margin-top: 20px; text-transform: uppercase; transition: text-shadow 0.4s ease, color 0.4s ease; }
         p.desc-text { font-size: 1.1rem; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; max-width: 400px; line-height: 1.6; margin-top: 15px; }
         
-        /* "Click anywhere to continue" instruction */
         h4.continue-text {
             opacity: 0; margin-top: 30px; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase;
             color: rgba(255,255,255,0.8); transition: opacity 0.4s ease;
@@ -70,7 +69,6 @@
         }
         @keyframes pulseText { 0%, 100% { opacity: 0.3; filter: blur(1px); } 50% { opacity: 1; filter: blur(0px); } }
 
-        /* Desktop Hover States */
         @media (min-width: 992px) {
             #split-container:hover .split-side { filter: brightness(0.4) grayscale(0.5); }
             #split-container .split-side:hover { flex: 5; filter: brightness(1) grayscale(0); z-index: 10; }
@@ -79,9 +77,8 @@
             .split-side:hover h4.continue-text { opacity: 1; transition-delay: 0.3s; }
         }
 
-        /* Mobile Gyroscope States: Overlapping Cards Layout */
         @media (max-width: 991px) {
-            #split-container { display: block; } /* Remove flex so we can absolute position */
+            #split-container { display: block; } 
             
             .split-side { 
                 position: absolute; top: 0; height: 100%; width: 50vw; 
@@ -90,13 +87,11 @@
             #side-dev { left: 0; z-index: 5; transform-origin: left center; }
             #side-consult { right: 0; z-index: 5; transform-origin: right center; }
 
-            /* ACTIVE STATE: Expands over the other card */
             .split-side.mobile-focus { width: 100vw; z-index: 10; filter: brightness(1) grayscale(0); }
             .split-side.mobile-focus .bg-layer { transform: scale(1.05); }
             .split-side.mobile-focus p.desc-text { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
             .split-side.mobile-focus h4.continue-text { opacity: 1; transition-delay: 0.3s; }
             
-            /* RECEDING STATE: The card sliding under */
             #side-consult.mobile-dim { transform: scale(0.92) translateX(10%); filter: brightness(0.3) grayscale(0.8); z-index: 1; pointer-events: none; }
             #side-dev.mobile-dim { transform: scale(0.92) translateX(-10%); filter: brightness(0.3) grayscale(0.8); z-index: 1; pointer-events: none; }
             
@@ -115,12 +110,10 @@
             background-size: 40px 40px; transform: perspective(500px) rotateX(60deg) translateY(100px) translateZ(-200px); opacity: 0.5;
         }
         
-        /* Base state */
         #side-dev h2 { color: #00ccff; text-shadow: none; }
         #side-dev p.desc-text { color: #00ccff; }
         #side-dev svg { color: #00ccff; filter: none; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease, color 0.4s ease; }
 
-        /* Ignited state (Hover/Tilt) */
         #side-dev:hover h2, #side-dev.mobile-focus h2 { color: #fff; text-shadow: 0 0 15px #00ccff, 0 0 30px #00ccff; }
         #side-dev:hover svg, #side-dev.mobile-focus svg { filter: drop-shadow(0 0 15px #00ccff); transform: scale(1.2) translateY(-10px); color: #fff;}
 
@@ -130,12 +123,15 @@
         #side-consult { border-left: 2px solid rgba(209, 178, 0, 0.3); }
         #side-consult .bg-layer { background: linear-gradient(135deg, #2c2a35 0%, #15141a 100%); }
         
-        /* Base state */
+        .particle {
+            position: absolute; background-color: #D1B200; border-radius: 50%;
+            pointer-events: none; box-shadow: 0 0 8px #D1B200; z-index: 1;
+        }
+
         #side-consult h2 { color: #D1B200; text-shadow: none; }
         #side-consult p.desc-text { color: #e0e0e0; }
         #side-consult svg { color: #D1B200; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease, color 0.4s ease; }
 
-        /* Ignited state (Hover/Tilt) */
         #side-consult:hover h2, #side-consult.mobile-focus h2 { color: #fff; text-shadow: 0 0 15px #D1B200, 0 0 30px #D1B200; }
         #side-consult:hover svg, #side-consult.mobile-focus svg { filter: drop-shadow(0 0 20px #D1B200); transform: scale(1.2) translateY(-10px); color: #fff;}
 
@@ -154,36 +150,49 @@
         .color-consult { color: #D1B200; }
         .blink { animation: blink 1s step-end infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* =========================================================
+           IMAGE BLINDS TRANSITION & NEXT PAGE
+        ========================================================= */
+        #blinds-container {
+            position: fixed; inset: 0; z-index: 10000;
+            display: none; /* Flex when activated */
+            width: 100vw; height: 100vh;
+        }
+        .blind {
+            flex: 1; height: 100%;
+            /* Using your existing background image for the curtain */
+            background-image: url('img/img-bg2.jpeg');
+            background-size: 100vw 100vh;
+            background-repeat: no-repeat;
+            transform-origin: center;
+        }
+
+        #next-page-placeholder {
+            position: fixed; inset: 0; z-index: 9998;
+            background: linear-gradient(135deg, #111, #222); display: none;
+            flex-direction: column; justify-content: center; align-items: center; color: white;
+        }
     </style>
 </head>
 <body>
 
-    <!-- MOBILE TILT INDICATOR -->
     <div id="tilt-overlay">
         <svg class="tilt-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="120px" height="120px">
-            <!-- Phone body -->
             <rect x="35" y="10" width="30" height="80" rx="4" fill="none" stroke="#fff" stroke-width="3"/>
-            <!-- Notch -->
             <line x1="45" y1="15" x2="55" y2="15" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-            <!-- Buttons -->
             <line x1="33" y1="30" x2="33" y2="40" stroke="#fff" stroke-width="2"/>
             <line x1="67" y1="35" x2="67" y2="45" stroke="#fff" stroke-width="2"/>
-            
-            <!-- Left Arrow (Curves up) -->
             <path d="M 25 60 C 15 55 15 45 25 40" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
             <polyline points="20,40 25,35 30,42" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            
-            <!-- Right Arrow (Curves down) -->
             <path d="M 75 40 C 85 45 85 55 75 60" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
             <polyline points="70,58 75,65 80,60" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <p><strong>Tap anywhere to begin.</strong><br>Tilt your device left or right to explore paths, then tap the screen to boot.</p>
     </div>
 
-    <!-- THE DUAL BOOT CHOICES -->
     <div id="split-container">
         
-        <!-- GAME DEVELOPER SIDE -->
         <div id="side-dev" class="split-side" onclick="initiateBoot('dev')">
             <div class="bg-layer"></div>
             <div class="content-layer">
@@ -194,7 +203,6 @@
             </div>
         </div>
 
-        <!-- STRATEGIC CONSULTANT SIDE -->
         <div id="side-consult" class="split-side" onclick="initiateBoot('consult')">
             <div class="bg-layer"></div>
             <div class="content-layer">
@@ -207,14 +215,64 @@
 
     </div>
 
-    <!-- BOOT SEQUENCE TAKEOVER -->
     <div id="boot-screen">
         <div id="terminal-output"></div>
         <div class="mt-4"><span class="blink">_</span></div>
     </div>
 
+    <div id="blinds-container"></div>
+
+    <div id="next-page-placeholder">
+        <h1 style="color: #D1B200; letter-spacing: 2px;">SYSTEM READY.</h1>
+        <p>The next portfolio page will load here.</p>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script>
+        // ==========================================
+        // DYNAMIC BLINDS GENERATOR
+        // Maps a single image seamlessly across columns
+        // ==========================================
+        const blindsContainer = document.getElementById('blinds-container');
+        const numberOfBlinds = 12; // Adjust for thinner/wider blinds
+        
+        for (let i = 0; i < numberOfBlinds; i++) {
+            let blind = document.createElement('div');
+            blind.classList.add('blind');
+            
+            // Calculate exact background position to make the image continuous
+            let posPercent = (i / (numberOfBlinds - 1)) * 100;
+            blind.style.backgroundPosition = `${posPercent}% 0`;
+            
+            blindsContainer.appendChild(blind);
+        }
+
+        // ==========================================
+        // GSAP GOLDEN PARTICLE GENERATOR
+        // ==========================================
+        const consultBg = document.querySelector('#side-consult .bg-layer');
+        
+        for (let i = 0; i < 40; i++) {
+            let particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            let size = gsap.utils.random(2, 6);
+            gsap.set(particle, {
+                width: size, height: size,
+                left: gsap.utils.random(0, 100) + '%',
+                top: gsap.utils.random(0, 100) + '%',
+                opacity: gsap.utils.random(0.3, 0.9)
+            });
+            
+            consultBg.appendChild(particle);
+
+            gsap.to(particle, {
+                y: gsap.utils.random(-150, -50), x: gsap.utils.random(-30, 30),
+                opacity: 0, duration: gsap.utils.random(3, 6),
+                repeat: -1, delay: gsap.utils.random(0, 5) 
+            });
+        }
+
         let isBooting = false;
 
         // ==========================================
@@ -223,13 +281,11 @@
         const overlay = document.getElementById('tilt-overlay');
         
         overlay.addEventListener('click', () => {
-            // Request Gyro permission on iOS
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission().then(state => {
                     if(state === 'granted') closeOverlay();
                 }).catch(console.error);
             } else {
-                // Non-iOS devices
                 closeOverlay();
             }
         });
@@ -245,25 +301,21 @@
         const consultSide = document.getElementById('side-consult');
 
         window.addEventListener("deviceorientation", (e) => {
-            // Only execute tilt logic on mobile sizes and if not currently booting
             if (isBooting || window.innerWidth > 991 || e.gamma === null) return; 
             
-            let gamma = e.gamma; // Left-to-Right Tilt
+            let gamma = e.gamma; 
 
             if (gamma < -15) {
-                // Tilted Left: Developer side slides OVER Consultant
                 devSide.classList.add('mobile-focus');
                 devSide.classList.remove('mobile-dim');
                 consultSide.classList.add('mobile-dim');
                 consultSide.classList.remove('mobile-focus');
             } else if (gamma > 15) {
-                // Tilted Right: Consultant side slides OVER Developer
                 consultSide.classList.add('mobile-focus');
                 consultSide.classList.remove('mobile-dim');
                 devSide.classList.add('mobile-dim');
                 devSide.classList.remove('mobile-focus');
             } else {
-                // Neutral (Dead Center): Show the 50/50 split again
                 devSide.classList.remove('mobile-focus', 'mobile-dim');
                 consultSide.classList.remove('mobile-focus', 'mobile-dim');
             }
@@ -298,10 +350,9 @@
         };
 
         function initiateBoot(type) {
-            // Only boot if the user is on desktop OR if the side has expanded on mobile
             const clickedSide = document.getElementById(type === 'dev' ? 'side-dev' : 'side-consult');
             if (window.innerWidth <= 991 && !clickedSide.classList.contains('mobile-focus')) {
-                return; // Ignore clicks on the un-expanded side
+                return; 
             }
 
             if (isBooting) return;
@@ -312,13 +363,9 @@
             const bootScreen = document.getElementById('boot-screen');
             const termOutput = document.getElementById('terminal-output');
 
-            // Lock the layout
             container.style.pointerEvents = "none";
-            
-            // Fade out internal text rapidly
             gsap.to(".content-layer", { opacity: 0, duration: 0.3 });
 
-            // Swallow the screen with the chosen side (Desktop vs Mobile logic)
             if (window.innerWidth > 991) {
                 gsap.to(clickedSide, { flex: 100, duration: 0.8, ease: "power4.inOut" });
                 gsap.to(otherSide, { flex: 0, duration: 0.8, ease: "power4.inOut", onComplete: startTerminal });
@@ -329,11 +376,9 @@
             }
 
             function startTerminal() {
-                // Show Terminal
                 bootScreen.style.display = "flex";
                 container.style.display = "none";
 
-                // Typewriter Sequence
                 const lines = bootSequences[type];
                 let tl = gsap.timeline();
 
@@ -344,12 +389,32 @@
                     termOutput.appendChild(p);
                     
                     let delay = line === "" ? 0.1 : Math.random() * 0.4 + 0.1;
-                    if(index === lines.length - 1) delay = 0.8;
+                    if(index === lines.length - 1) delay = 0.8; // Pause before last line
 
                     tl.to(p, { opacity: 1, duration: 0.1 }, `+=${delay}`);
                 });
 
-                // tl.call(() => { window.location.href = type === 'dev' ? 'developer.html' : 'consultant.html'; }, null, "+=1.5");
+                // AFTER TERMINAL FINISHES: Trigger the GSAP Blinds Effect!
+                tl.call(() => {
+                    // 1. Prepare elements
+                    blindsContainer.style.display = 'flex';
+                    document.getElementById('next-page-placeholder').style.display = 'flex';
+                    bootScreen.style.display = 'none';
+
+                    // 2. Animate blinds opening
+                    gsap.fromTo(".blind", 
+                        { scaleX: 1 }, 
+                        {
+                            scaleX: 0, 
+                            duration: 0.6,
+                            stagger: { amount: 0.4, from: "edges" },
+                            ease: "power2.inOut",
+                            onComplete: () => {
+                                blindsContainer.style.display = 'none'; // Clean up DOM
+                            }
+                        }
+                    );
+                }, null, "+=1"); // Wait 1 second after terminal finishes reading
             }
         }
     </script>

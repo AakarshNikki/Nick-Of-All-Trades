@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Developer Portfolio | Vertical Ascent</title>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,700"> 
+
+    <style>
+        /* =========================================================
+           GLOBAL RESET & NATIVE SCROLL CONFIG
+        ========================================================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100vw; 
+            overflow-x: hidden; overflow-y: auto;
+            background-color: #050508; font-family: 'Open Sans', sans-serif;
+            overscroll-behavior-y: none; /* Prevents mobile pull-to-refresh */
+        }
+
+        /* Fixed Background */
+        .bg-fixed {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050508 100%);
+            z-index: -2; pointer-events: none;
+        }
+
+        /* The Game World Container */
+        #game-world {
+            position: relative; width: 100%; 
+            z-index: 1;
+        }
+
+        /* Cyberpunk Grid Background attached to the scrolling world */
+        #game-world::before {
+            content: ""; position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(0, 204, 255, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 204, 255, 0.1) 1px, transparent 1px);
+            background-size: 60px 60px; opacity: 0.3; z-index: -1; pointer-events: none;
+        }
+
+        /* The Solid Ground at the very bottom */
+        .ground {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100px;
+            background: #111; border-top: 3px solid #00ccff;
+            box-shadow: 0 -5px 20px rgba(0, 204, 255, 0.2); z-index: 5;
+        }
+
+        /* =========================================================
+           HARDWARE ACCELERATED DYNAMIC ENTITIES
+        ========================================================= */
+        #character {
+            position: absolute; bottom: 0; left: 0; 
+            width: 40px; height: 60px; background-color: #00ccff; 
+            border-radius: 8px; box-shadow: 0 0 15px rgba(0, 204, 255, 0.8); z-index: 20;
+            will-change: transform; pointer-events: none;
+        }
+        #character.facing-left { transform: translate3d(var(--px), var(--py), 0) scaleX(-1) !important; }
+
+        .enemy {
+            position: absolute; bottom: 0; left: 0;
+            width: 35px; height: 35px; background-color: #ff3366; 
+            border-radius: 8px; box-shadow: 0 0 15px rgba(255, 51, 102, 0.8); z-index: 19;
+            will-change: transform; pointer-events: none;
+        }
+
+        /* Arcade Cabinets (Clickable by scrollers) */
+        .project-station {
+            position: absolute; bottom: 0; left: 0;
+            width: 120px; height: 160px; background: #1a1a2e; border: 2px solid #00ccff; border-bottom: none; 
+            border-radius: 10px 10px 0 0; display: flex; flex-direction: column; align-items: center; z-index: 10;
+            cursor: pointer; transition: filter 0.3s ease;
+        }
+        .project-station:hover { filter: brightness(1.5) drop-shadow(0 0 20px rgba(0,204,255,0.5)); }
+        
+        .project-screen {
+            width: 80%; height: 50px; background: #00ccff; margin-top: 20px;
+            border-radius: 4px; box-shadow: 0 0 10px #00ccff; animation: pulseScreen 2s infinite; pointer-events: none;
+        }
+        @keyframes pulseScreen { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+
+        .station-label {
+            position: absolute; top: -45px; width: 200px; text-align: center;
+            color: #00ccff; font-weight: bold; text-shadow: 0 2px 5px #000;
+            font-size: 0.9rem; pointer-events: none;
+        }
+
+        /* Platforms */
+        .platform {
+            position: absolute; bottom: 0; left: 0;
+            background: #1a1a2e; border: 2px solid #00ccff; border-radius: 4px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 4; pointer-events: none;
+        }
+        .platform.moving { 
+            border-color: #D1B200; box-shadow: 0 0 15px rgba(209, 178, 0, 0.3); 
+            will-change: transform; 
+        }
+
+        /* Bounce Pads */
+        .bounce-pad {
+            position: absolute; bottom: 0; left: 0; background: #D1B200; 
+            border-radius: 10px 10px 0 0; box-shadow: 0 0 15px #D1B200; z-index: 6;
+            transition: transform 0.1s ease, filter 0.1s ease; transform-origin: bottom center;
+        }
+        .bounce-pad.active { filter: brightness(1.5); transform: translate3d(var(--px), var(--py), 0) scaleY(1.5) !important; }
+
+        /* Wind Zones */
+        .wind-zone {
+            position: absolute; bottom: 0; left: 0; overflow: hidden; z-index: 2;
+            border-left: 1px dashed rgba(0, 204, 255, 0.3); border-right: 1px dashed rgba(0, 204, 255, 0.3);
+            background: linear-gradient(0deg, transparent, rgba(0, 204, 255, 0.1)); pointer-events: none;
+        }
+        .wind-particles {
+            width: 100%; height: 200%; 
+            background: repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(0, 204, 255, 0.4) 30px, rgba(0, 204, 255, 0.4) 60px);
+            animation: blowUp 1s linear infinite;
+        }
+        @keyframes blowUp { 100% { transform: translateY(-50%); } }
+
+        /* =========================================================
+           USER INTERFACE & OVERLAYS
+        ========================================================= */
+        #interaction-prompt {
+            position: fixed; top: 15%; left: 50%; transform: translate(-50%, 0);
+            background: rgba(5, 5, 8, 0.9); border: 1px solid #00ccff; color: #fff; 
+            padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 204, 255, 0.3); 
+            text-align: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; cursor: pointer;
+        }
+        #interaction-prompt h3 { color: #00ccff; margin-bottom: 5px; font-weight: 700; font-size: 1.2rem; }
+        #interaction-prompt p { font-size: 0.85rem; color: #aaa; margin-bottom: 10px; }
+        .btn-hint { display: inline-block; background: #00ccff; color: #000; padding: 5px 15px; font-weight: bold; border-radius: 20px; font-size: 0.8rem; }
+
+        .scroll-hint {
+            position: fixed; top: 20px; right: 20px; color: rgba(255, 255, 255, 0.6); 
+            background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 8px; font-size: 0.85rem; z-index: 90;
+            border: 1px solid rgba(255,255,255,0.2); pointer-events: none;
+        }
+
+        /* Modal / Theater Mode */
+        #project-modal {
+            position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            width: 90%; max-width: 800px; background: #111; border: 1px solid #00ccff; border-radius: 8px; 
+            padding: 30px; color: white; text-align: center; box-shadow: 0 0 50px rgba(0,204,255,0.2);
+        }
+        .close-modal { margin-top: 20px; padding: 10px 20px; background: #333; color: white; border: none; cursor: pointer; border-radius: 4px; }
+
+        /* Mobile Touch Controls */
+        #touch-controls { position: fixed; bottom: 20px; left: 0; right: 0; display: none; justify-content: space-between; padding: 0 20px; z-index: 1000; }
+        .d-pad, .action-buttons { display: flex; gap: 10px; }
+        .btn-touch {
+            width: 55px; height: 55px; border-radius: 50%; background: rgba(0, 204, 255, 0.1); border: 2px solid rgba(0, 204, 255, 0.5);
+            color: #00ccff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold;
+            backdrop-filter: blur(4px);
+        }
+        .btn-touch:active { background: rgba(0, 204, 255, 0.4); }
+
+        @media (max-width: 991px) { #touch-controls { display: flex; } }
+    </style>
+</head>
+<body>
+
+    <div class="bg-fixed"></div>
+
+    <div id="game-world">
+        <div class="ground"></div>
+        <div id="character"></div>
+    </div>
+
+    <div class="scroll-hint">
+        Scroll, Swipe, or Play to Ascend ⇧
+    </div>
+
+    <div id="interaction-prompt" onclick="openActiveProject()">
+        <h3 id="prompt-title">Project Name</h3>
+        <p id="prompt-desc">Short description of the game/project.</p>
+        <div class="btn-hint">Press [ENTER] or Tap B</div>
+    </div>
+
+    <div id="touch-controls">
+        <div class="d-pad">
+            <div class="btn-touch" id="btn-left">←</div>
+            <div class="btn-touch" id="btn-right">→</div>
+        </div>
+        <div class="action-buttons">
+            <div class="btn-touch" id="btn-b" style="margin-top: 20px;">B</div> 
+            <div class="btn-touch" id="btn-a">A</div> 
+        </div>
+    </div>
+
+    <div id="project-modal">
+        <div class="modal-box">
+            <h2 id="modal-title" style="color: #00ccff;">Loading...</h2>
+            <p id="modal-desc" class="mt-3">Preparing WebGL Instance...</p>
+            <div style="width: 100%; height: 300px; background: #050508; margin-top: 20px; border: 1px dashed #00ccff; display: flex; align-items:center; justify-content: center;">
+                [ GAME IFRAME WOULD LOAD HERE ]
+            </div>
+            <button class="close-modal" onclick="closeModal()">Close & Return to World</button>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // 1. DATA CONFIGURATION
+        // =====================================================
+        const projectsData = [
+            { id: 1, title: "Procedural Platformer", desc: "Godot 2D logic." },
+            { id: 2, title: "RL Agent Arena", desc: "Python Reinforcement Learning." },
+            { id: 3, title: "3D Animation Slider", desc: "Unity advanced mechanics." },
+            { id: 4, title: "Narrative Engine", desc: "Dialogue parsing & branching paths." },
+            { id: 5, title: "Pixel Shaders", desc: "Custom WebGL shader demonstrations." },
+            { id: 6, title: "Gravity Core", desc: "Physics manipulation mini-game." },
+            { id: 7, title: "Local AI Chatbot", desc: "Offline API Integration." },
+            { id: 8, title: "The Summit", desc: "The culmination of architecture." }
+        ];
+
+        const world = document.getElementById('game-world');
+        let projectNodes = [], enemies = [], platforms = [], bouncePads = [], windZones = [];
+        
+        const screenW = window.innerWidth;
+        const P_WIDTH = 40; 
+
+        // =====================================================
+        // 2. FIXED VERTICAL PROCEDURAL GENERATOR 
+        // =====================================================
+        const SPACING_Y = 600; 
+        const START_Y = 100; // Ground Level
+        const levelHeight = START_Y + (projectsData.length * SPACING_Y) + 400; 
+        world.style.height = `${levelHeight}px`;
+
+        // Start user at the bottom
+        window.scrollTo(0, document.body.scrollHeight);
+
+        function addPlatform(x, y, w, h, isMoving = false, speed = 0, distance = 0) {
+            let el = document.createElement('div');
+            el.className = isMoving ? 'platform moving' : 'platform';
+            el.style.width = `${w}px`; el.style.height = `${h}px`;
+            el.style.transform = `translate3d(${x}px, ${-(y - h)}px, 0)`; // y is the top surface
+            world.appendChild(el);
+            platforms.push({ element: el, x: x, y: y, w: w, h: h, isMoving: isMoving, vx: speed, startX: x, endX: x + distance });
+        }
+
+        function addEnemy(x, y, patrolDist) {
+            let el = document.createElement('div');
+            el.className = 'enemy';
+            el.style.transform = `translate3d(${x}px, ${-y}px, 0)`;
+            world.appendChild(el);
+            enemies.push({ element: el, x: x, y: y, w: 35, h: 35, vx: 3, startX: x, endX: x + patrolDist });
+        }
+
+        function addBouncePad(x, y, force) {
+            let el = document.createElement('div');
+            el.className = 'bounce-pad';
+            el.style.width = `50px`; el.style.height = `15px`;
+            el.style.transform = `translate3d(${x}px, ${-y}px, 0)`;
+            world.appendChild(el);
+            bouncePads.push({ element: el, x: x, y: y, w: 50, h: 15, force: force });
+        }
+
+        function addWindZone(x, y, targetY) {
+            let el = document.createElement('div');
+            el.className = 'wind-zone';
+            el.style.width = `120px`; el.style.height = `${targetY}px`;
+            el.style.transform = `translate3d(${x}px, ${-y}px, 0)`;
+            el.innerHTML = `<div class="wind-particles"></div>`;
+            world.appendChild(el);
+            windZones.push({ element: el, x: x, y: y, w: 120, h: targetY, force: 1.2, maxSpeed: 15 });
+        }
+
+        // Base width logic for safe platform placement
+        const safeWidth = Math.min(screenW - 150, 800); 
+        const center = (screenW - 120) / 2; // Center of screen minus half project width
+        const leftSide = Math.max(20, (screenW - safeWidth) / 2);
+        const rightSide = leftSide + safeWidth - 150;
+
+        projectsData.forEach((proj, i) => {
+            let projY = START_Y + (i * SPACING_Y); 
+            
+            let projX = center;
+            if (i % 3 === 1) projX = leftSide;
+            if (i % 3 === 2) projX = rightSide;
+
+            // Generate traversal paths UPWARDS from previous project
+            if (i > 0) {
+                let prevY = START_Y + ((i - 1) * SPACING_Y);
+                let prevX = center;
+                if ((i-1) % 3 === 1) prevX = leftSide;
+                if ((i-1) % 3 === 2) prevX = rightSide;
+                
+                let type = i % 3; // 3 core traversal logic paths
+
+                if (type === 0) {
+                    // Type 0: Zig-Zag Stairs
+                    addPlatform(center - 60, prevY + 150, 120, 20);
+                    addPlatform(projX === leftSide ? rightSide : leftSide, prevY + 300, 120, 20);
+                    addPlatform(projX - 60, prevY + 450, 120, 20);
+                }
+                else if (type === 1) {
+                    // Type 1: High Bounce Pad
+                    let pX = (prevX === leftSide) ? rightSide : leftSide;
+                    addPlatform(pX, prevY + 150, 120, 20);
+                    addBouncePad(pX + 35, prevY + 150, 32); 
+                    
+                    // Moving safety net near the top
+                    addPlatform(projX - 60, prevY + 450, 150, 20, true, 2, 200); 
+                }
+                else if (type === 2) {
+                    // Type 2: Wind Tunnel
+                    let wX = center;
+                    addPlatform(wX - 60, prevY + 100, 150, 20);
+                    addWindZone(wX - 15, prevY + 100, 350); 
+                    addPlatform(projX - 60, prevY + 450, 120, 20); 
+                }
+
+                // Random enemy on a middle platform occasionally
+                if (Math.random() > 0.5) addEnemy(center, prevY + 300, 100);
+            }
+
+            // The specific platform holding the Arcade Cabinet
+            if (projY > START_Y) addPlatform(projX - 30, projY, 180, 20);
+
+            // Draw Arcade Cabinet
+            let station = document.createElement('div');
+            station.className = 'project-station';
+            station.style.transform = `translate3d(${projX}px, ${-projY}px, 0)`;
+            station.innerHTML = `
+                <div class="station-label">${proj.title}</div>
+                <div class="project-screen"></div>
+            `;
+            
+            station.onclick = () => { activeProject = {data: proj}; openActiveProject(); };
+            
+            world.appendChild(station);
+            projectNodes.push({ element: station, x: projX, y: projY, width: 120, data: proj });
+        });
+
+
+        // =====================================================
+        // 3. 1-WAY PLATFORM PHYSICS ENGINE
+        // =====================================================
+        const charEl = document.getElementById('character');
+        const promptEl = document.getElementById('interaction-prompt');
+        
+        let pX = center + 40, pY = 100; // Start precisely on ground
+        let pVx = 0, pVy = 0; 
+        const pH = 60;
+        const speed = 7, friction = 0.8, gravity = 1.0, jumpForce = 20;
+
+        let activeProject = null;
+        let currentPlatform = null;
+        let isGamePaused = false; 
+        
+        let autoPan = true;
+        window.addEventListener('wheel', () => autoPan = false, {passive: true});
+        window.addEventListener('touchstart', () => autoPan = false, {passive: true});
+
+        const keys = { left: false, right: false, up: false, interact: false };
+
+        function handleKey(e, isDown) {
+            if(e.code === 'ArrowLeft' || e.code === 'KeyA') { keys.left = isDown; autoPan = true; }
+            if(e.code === 'ArrowRight' || e.code === 'KeyD') { keys.right = isDown; autoPan = true; }
+            if(e.code === 'ArrowUp' || e.code === 'Space') { keys.up = isDown; autoPan = true; }
+            if(e.code === 'Enter' && isDown) handleInteract();
+        }
+        window.addEventListener('keydown', (e) => handleKey(e, true));
+        window.addEventListener('keyup', (e) => handleKey(e, false));
+
+        function bindTouch(id, keyProp, isAction = false) {
+            const el = document.getElementById(id);
+            el.addEventListener('pointerdown', (e) => { e.preventDefault(); autoPan = true; if(isAction) handleInteract(); else keys[keyProp] = true; });
+            el.addEventListener('pointerup', (e) => { e.preventDefault(); keys[keyProp] = false; });
+            el.addEventListener('pointercancel', (e) => { e.preventDefault(); keys[keyProp] = false; });
+            el.addEventListener('pointerleave', (e) => { e.preventDefault(); keys[keyProp] = false; });
+        }
+        bindTouch('btn-left', 'left'); bindTouch('btn-right', 'right'); bindTouch('btn-a', 'up'); bindTouch('btn-b', 'interact', true);
+
+        // =====================================================
+        // 4. MAIN GAME LOOP
+        // =====================================================
+        function gameLoop() {
+            if (!isGamePaused) {
+                
+                // 1. UPDATE MOVEMENTS
+                platforms.forEach(plat => {
+                    if (plat.isMoving) {
+                        plat.x += plat.vx;
+                        if (plat.x > plat.endX || plat.x < plat.startX) plat.vx *= -1;
+                        plat.element.style.transform = `translate3d(${plat.x}px, ${-(plat.y - plat.h)}px, 0)`;
+                    }
+                });
+
+                enemies.forEach(enemy => {
+                    enemy.x += enemy.vx;
+                    if (enemy.x > enemy.endX || enemy.x < enemy.startX) enemy.vx *= -1;
+                    enemy.element.style.transform = `translate3d(${enemy.x}px, ${-enemy.y}px, 0)`;
+                });
+
+                // 2. HORIZONTAL MOVEMENT
+                if (keys.left) { pVx = -speed; charEl.classList.add('facing-left'); } 
+                else if (keys.right) { pVx = speed; charEl.classList.remove('facing-left'); } 
+                else { pVx *= friction; if(Math.abs(pVx) < 0.1) pVx = 0; }
+
+                pX += pVx;
+                if (currentPlatform && currentPlatform.isMoving) pX += currentPlatform.vx; 
+
+                // 3. VERTICAL MOVEMENT & WIND
+                let inWind = false;
+                windZones.forEach(wind => {
+                    if (pX + P_WIDTH > wind.x && pX < wind.x + wind.w && pY < wind.y + wind.h && pY + pH > wind.y) {
+                        inWind = true; pVy += wind.force;
+                        if (pVy > wind.maxSpeed) pVy = wind.maxSpeed;
+                    }
+                });
+
+                if (!inWind) pVy -= gravity; 
+                if (keys.up && (pY === 100 || currentPlatform)) { pVy = jumpForce; currentPlatform = null; }
+
+                let prevY = pY;
+                let targetY = pY + pVy;
+                currentPlatform = null;
+
+                // 4. ONE-WAY PLATFORM COLLISION (Only collide when falling down!)
+                if (targetY <= 100) { targetY = 100; pVy = 0; currentPlatform = "ground"; } 
+
+                if (pVy <= 0 && !inWind) {
+                    platforms.forEach(plat => {
+                        // Check if player's X overlaps the platform
+                        if (pX + P_WIDTH > plat.x && pX < plat.x + plat.w) {
+                            // Check if player was previously ABOVE the platform, and is now BELOW or AT the platform
+                            if (prevY >= plat.y && targetY <= plat.y) {
+                                targetY = plat.y; pVy = 0; currentPlatform = plat;
+                            }
+                        }
+                    });
+                }
+                pY = targetY;
+
+                // 5. BOUNCE PADS & ENEMIES
+                bouncePads.forEach(pad => {
+                    if (pX + P_WIDTH > pad.x && pX < pad.x + pad.w && pY >= pad.y && pY <= pad.y + 10 && pVy <= 0) {
+                        pVy = pad.force; currentPlatform = null;
+                        pad.element.style.setProperty('--px', `${pad.x}px`);
+                        pad.element.style.setProperty('--py', `${-pad.y}px`);
+                        pad.element.classList.add('active');
+                        setTimeout(() => pad.element.classList.remove('active'), 150);
+                    }
+                });
+
+                enemies.forEach(enemy => {
+                    if (pX < enemy.x + enemy.w && pX + P_WIDTH > enemy.x && pY < enemy.y + enemy.h && pY + pH > enemy.y) {
+                        pVy = 12; pVx = (pX < enemy.x) ? -15 : 15; currentPlatform = null;
+                    }
+                });
+
+                // Screen Bounds
+                if (pX < 0) pX = 0;
+                if (pX > screenW - P_WIDTH) pX = screenW - P_WIDTH;
+
+                // 6. RENDER PLAYER
+                charEl.style.setProperty('--px', `${pX}px`);
+                charEl.style.setProperty('--py', `${-pY}px`);
+                if(!charEl.classList.contains('facing-left')) charEl.style.transform = `translate3d(${pX}px, ${-pY}px, 0)`;
+
+                // 7. CAMERA PANNING (Native Scroll sync)
+                if (autoPan) {
+                    let targetScroll = document.body.scrollHeight - pY - (window.innerHeight / 1.5);
+                    window.scrollTo(0, targetScroll);
+                }
+
+                checkProximity();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function checkProximity() {
+            let found = null;
+            projectNodes.forEach(proj => {
+                let centerX = proj.x + (proj.width / 2);
+                let playerCenterX = pX + (P_WIDTH / 2);
+                if (Math.abs(playerCenterX - centerX) < 80 && Math.abs(pY - proj.y) < 10) found = proj;
+            });
+
+            if (found !== activeProject) {
+                activeProject = found;
+                if (activeProject) {
+                    document.getElementById('prompt-title').innerText = activeProject.data.title;
+                    document.getElementById('prompt-desc').innerText = activeProject.data.desc;
+                    promptEl.style.opacity = 1; 
+                } else {
+                    promptEl.style.opacity = 0; 
+                }
+            }
+        }
+
+        // =====================================================
+        // 5. THEATER MODE
+        // =====================================================
+        const modal = document.getElementById('project-modal');
+
+        function handleInteract() { if (activeProject && !isGamePaused) openActiveProject(); }
+
+        window.openActiveProject = function() {
+            if (!activeProject) return;
+            isGamePaused = true;
+            document.getElementById('modal-title').innerText = activeProject.data.title;
+            modal.style.display = 'flex'; promptEl.style.opacity = 0; 
+            keys.left = false; keys.right = false; keys.up = false;
+        };
+
+        window.closeModal = function() {
+            modal.style.display = 'none'; isGamePaused = false; checkProximity(); 
+        };
+
+        gameLoop();
+    </script>
+</body>
+</html>

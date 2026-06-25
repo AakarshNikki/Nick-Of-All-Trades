@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Consulting & Enterprise Solutions | Aakarsh Nikki</title>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800"> 
+    <link rel="stylesheet" href="css/bootstrap.min.css">                                                 
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            background-color: #050508; 
+            color: #e0e0e0; font-family: 'Open Sans', sans-serif;
+            scroll-behavior: smooth; overflow: hidden;
+        }
+
+        h1, h2, h3, h4 { color: #fff; font-weight: 700; margin-bottom: 1rem; }
+        .text-gold { color: #D1B200 !important; }
+        .bg-dark-panel { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(209, 178, 0, 0.1); border-radius: 12px; backdrop-filter: blur(10px); }
+
+        #bg-canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -2; display: block;
+        }
+        
+        .bg-overlay {
+            position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background: linear-gradient(135deg, rgba(31, 30, 38, 0.85) 0%, rgba(13, 12, 17, 0.95) 100%);
+        }
+
+        .layout-wrapper {
+            display: flex; width: 100vw; height: 100vh; overflow: hidden; position: relative; z-index: 10;
+        }
+
+        .sidebar {
+            width: 35%; height: 100vh;
+            display: flex; flex-direction: column; justify-content: center;
+            padding-left: 10%; position: relative;
+            background: transparent; z-index: 100;
+        }
+
+        .nav-menu {
+            list-style: none; padding: 0; margin: 0;
+            display: flex; flex-direction: column; gap: 2rem;
+        }
+
+        .nav-item {
+            font-size: 4rem; font-weight: 800; letter-spacing: 2px;
+            text-decoration: none; text-transform: capitalize;
+            color: transparent;
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.6);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            display: inline-block; cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: #D1B200;
+            -webkit-text-stroke: 0px transparent;
+            transform: translateX(20px);
+            text-shadow: 0 10px 20px rgba(209, 178, 0, 0.3);
+        }
+
+        .main-content {
+            width: 65%; height: 100vh; overflow-y: auto; overflow-x: hidden;
+            position: relative; scroll-behavior: smooth;
+            padding: 0; margin: 0;
+        }
+
+        .watermark {
+            position: fixed; right: -5%; bottom: -5%;
+            font-size: 15rem; font-weight: 800; line-height: 0.8;
+            color: rgba(255, 255, 255, 0.02); pointer-events: none; z-index: 0;
+            text-transform: uppercase; word-wrap: break-word; width: 50vw; text-align: right;
+        }
+
+        section {
+            min-height: 100vh; padding: 100px 5%;
+            display: flex; flex-direction: column; justify-content: center;
+            position: relative; z-index: 1; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .hero-content h1 { font-size: 3.5rem; letter-spacing: -1px; line-height: 1.2; margin-bottom: 20px; }
+        .hero-content p { font-size: 1.2rem; color: #aaa; margin-bottom: 40px; max-width: 800px;}
+        
+        .service-card { padding: 40px 30px; height: 100%; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .service-card:hover {
+            transform: translateY(-10px); border-color: rgba(209, 178, 0, 0.4);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(209, 178, 0, 0.05);
+        }
+        .service-icon {
+            width: 60px; height: 60px; background: rgba(209, 178, 0, 0.1); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; color: #D1B200; margin-bottom: 25px;
+        }
+
+        .client-logo { opacity: 0.4; transition: opacity 0.3s ease; filter: grayscale(100%); height: 40px; margin: 20px 30px; }
+        .client-logo:hover { opacity: 1; filter: grayscale(0%); }
+
+        .form-control, .form-select {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff;
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; width: 100%; transition: border-color 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus { outline: none; border-color: #D1B200; box-shadow: 0 0 10px rgba(209, 178, 0, 0.2); }
+        .form-select option { background: #1f1e26; color: #fff; }
+
+        .subscription-box { background: linear-gradient(135deg, rgba(209, 178, 0, 0.1) 0%, transparent 100%); border-color: rgba(209, 178, 0, 0.3); }
+
+        .btn-gold {
+            background: #D1B200; color: #000; padding: 12px 30px; border-radius: 30px; border: none;
+            font-weight: 700; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; cursor: pointer;
+        }
+        .btn-gold:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(209, 178, 0, 0.3); }
+
+        .wa-btn {
+            background: #25D366; color: #fff; padding: 15px 30px; border-radius: 30px;
+            font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+            transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2);
+        }
+        .wa-btn:hover { background: #1ebe57; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4); color: #fff; }
+
+        .reveal-up { opacity: 0; visibility: hidden; }
+
+        @media (max-width: 991px) {
+            .layout-wrapper { flex-direction: column; overflow: auto; height: auto; }
+            .sidebar { width: 100%; height: auto; padding: 40px 20px; position: sticky; top: 0; background: rgba(13,12,17,0.9); backdrop-filter: blur(10px); z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .nav-menu { flex-direction: row; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+            .nav-item { font-size: 1.5rem; }
+            .nav-item:hover, .nav-item.active { transform: translateY(-5px) translateX(0); }
+            .main-content { width: 100%; height: auto; overflow: visible; }
+            section { min-height: auto; padding: 60px 5%; }
+            .watermark { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+    <div class="bg-overlay"></div>
+
+    <div class="layout-wrapper">
+        
+        <nav class="sidebar">
+            <ul class="nav-menu">
+                <li><a href="#intro" class="nav-item active" data-target="intro">Intro</a></li>
+                <li><a href="#services" class="nav-item" data-target="services">Services</a></li>
+                <li><a href="#clients" class="nav-item" data-target="clients">Clients</a></li>
+                <li><a href="#contact" class="nav-item" data-target="contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content" id="main-scroll-area">
+            
+            <div class="watermark">STRATEGY<br>DATA<br>LOGIC</div>
+
+            <section id="intro">
+                <div class="hero-content reveal-up">
+                    <h4 class="text-gold text-uppercase tracking-widest mb-3">Enterprise Consulting</h4>
+                    <h1>Architecting <span class="text-gold">Scalable Systems</span> for Modern Business</h1>
+                    <p>From privacy-first Local AI deployments to complete digital brand transformations. I build the infrastructure that reduces costs and automates your growth.</p>
+                </div>
+            </section>
+
+            <section id="services">
+                <div class="row text-left mb-5 reveal-up">
+                    <div class="col-12">
+                        <h2>Core <span class="text-gold">Competencies</span></h2>
+                        <p class="text-muted">Targeted solutions designed to modernize and optimize your operations.</p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-12 col-xl-6 reveal-up">
+                        <div class="bg-dark-panel service-card">
+                            <div class="service-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-480H200v480Zm0 0v-480 480Zm280-120q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z"/></svg>
+                            </div>
+                            <h4>Digital Brand Identity</h4>
+                            <p class="text-muted small">Complete ecosystem design including responsive websites, logo engineering, typography systems, and comprehensive social media management.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-6 reveal-up">
+                        <div class="bg-dark-panel service-card">
+                            <div class="service-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="currentColor"><path d="M320-240 80-480l240-240 57 57-184 183 184 183-57 57Zm320 0-57-57 184-183-184-183 57-57 240 240-240 240Z"/></svg>
+                            </div>
+                            <h4>Custom Architecture</h4>
+                            <p class="text-muted small">Bespoke application development tailored specifically to your internal business needs, bypassing off-the-shelf limitations.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-6 reveal-up">
+                        <div class="bg-dark-panel service-card">
+                            <div class="service-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm0 0v-480 480Z"/></svg>
+                            </div>
+                            <h4>Local AI Integration</h4>
+                            <p class="text-muted small">Offline, privacy-first LLM installations. Generate marketing material and analyze raw user data securely on your own hardware.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-6 reveal-up">
+                        <div class="bg-dark-panel service-card">
+                            <div class="service-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="currentColor"><path d="M120-120v-80h720v80H120Zm76-200L80-436l320-320 200 200 224-224 56 56-280 280-200-200-204 204Z"/></svg>
+                            </div>
+                            <h4>Cost & Automation Analysis</h4>
+                            <p class="text-muted small">Strategic consultancy to identify workflow bottlenecks and implement automated systems that drastically reduce operational overhead.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="clients">
+                <div class="row mb-5 reveal-up">
+                    <div class="col-12">
+                        <h5 class="text-muted mb-4 text-uppercase tracking-widest" style="letter-spacing: 2px;">Trusted By</h5>
+                        <div class="d-flex flex-wrap align-items-center gap-4">
+                            <svg class="client-logo" viewBox="0 0 100 30" fill="#fff"><path d="M10,15 L20,5 L30,15 L20,25 Z M40,5 H60 V25 H40 Z M70,15 A10,10 0 1,0 90,15 A10,10 0 1,0 70,15"/></svg>
+                            <svg class="client-logo" viewBox="0 0 100 30" fill="#fff"><circle cx="20" cy="15" r="10"/><rect x="40" y="5" width="20" height="20"/><polygon points="80,5 95,25 65,25"/></svg>
+                            <svg class="client-logo" viewBox="0 0 100 30" fill="#fff"><path d="M0,15 Q25,0 50,15 T100,15 v10 H0 Z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row reveal-up mt-5">
+                    <div class="col-12">
+                        <div class="bg-dark-panel subscription-box p-4 p-lg-5 text-left">
+                            <h3 class="text-gold">Stay Ahead of the Curve</h3>
+                            <p class="mb-4">Subscribe to receive highly curated updates on the latest technological advancements and automation strategies directly impacting your industry.</p>
+                            
+                            <form action="#" method="POST">
+                                <div class="row">
+                                    <div class="col-md-6"><input type="text" class="form-control" placeholder="Full Name" required></div>
+                                    <div class="col-md-6"><input type="email" class="form-control" placeholder="Email Address" required></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6"><input type="tel" class="form-control" placeholder="Phone Number" required></div>
+                                    <div class="col-md-6">
+                                        <select class="form-select" required>
+                                            <option value="" disabled selected>Select Business Category</option>
+                                            <option value="ecommerce">E-Commerce & Retail</option>
+                                            <option value="healthcare">Healthcare & MedTech</option>
+                                            <option value="finance">Finance & FinTech</option>
+                                            <option value="education">Education & EdTech</option>
+                                            <option value="agency">Agency / Services</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-gold mt-2">Subscribe to Updates</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact">
+                <div class="row reveal-up">
+                    <div class="col-12 col-xl-5 mb-5 mb-xl-0 pr-xl-5">
+                        <h2 class="mb-4">Let's Build <br><span class="text-gold">Something Great.</span></h2>
+                        <p class="text-muted mb-5">Whether you need a complete brand overhaul or a secure, offline AI installation, I am ready to discuss your architecture.</p>
+                        
+                        <h5 class="mb-3">Direct Contact</h5>
+                        <a href="https://wa.me/1234567890" target="_blank" class="wa-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="1.5rem" viewBox="0 0 448 512" fill="currentColor"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 222.4-99.6 222.4-222 0-59.3-23.1-115-65.4-157zM223.9 414.8h-.1c-32.9 0-65.2-8.8-93.5-25.5l-6.7-4-69.5 18.2 18.5-67.8-4.4-7c-18.3-29-28-62.4-28-96.5 0-101.5 82.5-184.1 184.1-184.1 49.2 0 95.4 19.2 130.2 54 34.8 34.8 54 81 54 130.2 0 101.5-82.6 184.1-184 184.1zM324.7 277.6c-5.5-2.8-32.6-16.1-37.7-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-2.1-3.6 2.1-3.2 7.6-14 2.8-5.6 1.4-10.4-.5-13.3-1.8-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.6-13.3 37.2-26.2 4.6-13 4.6-24.1 3.2-26.2-1.3-2.1-5-3.3-10.5-6.1z"/></svg>
+                            Message on WhatsApp
+                        </a>
+                    </div>
+
+                    <div class="col-12 col-xl-7 mt-5 mt-xl-0">
+                        <div class="bg-dark-panel p-4 p-lg-5">
+                            <form action="#" method="POST">
+                                <input type="text" class="form-control" placeholder="Full Name" required>
+                                <input type="email" class="form-control" placeholder="Email Address" required>
+                                <input type="tel" class="form-control" placeholder="Phone Number" required>
+                                <textarea class="form-control" rows="5" placeholder="Tell me about your project or business needs..." required></textarea>
+                                <button type="submit" class="btn-gold mt-2">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="text-left py-4 px-5 border-top" style="border-color: rgba(255,255,255,0.05) !important;">
+                <p class="small text-muted mb-0">Copyright &copy; <span id="year"></span> Aakarsh Nikki. All rights reserved.</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- CDNs FOR THREE.JS & GSAP -->
+    <script src="three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <!-- WRAPPED INSIDE DOMContentLoaded TO ENSURE HTML IS RENDERED BEFORE QUERYING -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            const scrollArea = document.getElementById('main-scroll-area');
+            const navLinks = document.querySelectorAll('.nav-item');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    if(targetSection) {
+                        scrollArea.scrollTo({
+                            top: targetSection.offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('section');
+            const observerOptions = { root: scrollArea, rootMargin: '0px', threshold: 0.5 };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => link.classList.remove('active'));
+                        const activeLink = document.querySelector(`.nav-item[data-target="${entry.target.id}"]`);
+                        if (activeLink) activeLink.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(sec => observer.observe(sec));
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            const revealElements = document.querySelectorAll('.reveal-up');
+            revealElements.forEach((el) => {
+                gsap.fromTo(el, 
+                    { autoAlpha: 0, y: 50 }, 
+                    { 
+                        autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: el,
+                            scroller: "#main-scroll-area", 
+                            start: "top 85%", 
+                            toggleActions: "play none none reverse"
+                        }
+                    }
+                );
+            });
+        });
+    </script>
+
+    <!-- PROCEDURAL 3D BACKGROUND -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const imgRatio = 634 / 951;
+            const targetCameraZ = 180;
+            const instanceSize = 1;
+            const randRangeZ = 2 * targetCameraZ * 0.99; 
+            const initCamaraZ = targetCameraZ / 5;
+
+            const canvas = document.getElementById('bg-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.5, 1000);
+            camera.position.set(0, 0, initCamaraZ);
+
+            function f(x, y, targetZ) {
+                const h = 0.5; 
+                const d = targetCameraZ;
+                const D = -targetZ + d;
+                const H = h / d * D;
+                const s = H / h;
+                return { s, p: new THREE.Vector3(x * s, y * s, targetZ) };
+            }
+
+            const mesh = (() => {
+                const nRow = 256;
+                const nCol = nRow * imgRatio | 0;
+                const sz = instanceSize;
+
+                const geom = new THREE.BoxGeometry(sz, sz, sz).translate(0, 0, -.5 * sz);
+                const mat = new THREE.MeshBasicMaterial();
+                const mesh = new THREE.InstancedMesh(geom, mat, nCol * nRow);
+
+                for (let i = 0, c = 0; i < nRow; ++i) {
+                    for (let j = 0; j < nCol; ++j) {
+                        const { p, s } = f(
+                            (j - nCol / 2 + 0.5) * sz,
+                            (nRow / 2 - i + 0.5) * sz,
+                            THREE.MathUtils.randFloatSpread(randRangeZ) * sz
+                        );
+                        const m = new THREE.Matrix4().setPosition(p).multiply(new THREE.Matrix4().makeScale(s, s, s));
+                        mesh.setMatrixAt(c, m);
+                        mesh.setColorAt(c, new THREE.Color('white'));
+                        ++c;
+                    }
+                }
+                mesh.instanceMatrix.needsUpdate = true;
+                mesh.instanceColor.needsUpdate = true;
+                return mesh;
+            })();
+            scene.add(mesh);
+
+            const can = document.createElement('canvas');
+            can.height = 256;
+            can.width = can.height * imgRatio | 0;
+            const ctx = can.getContext('2d');
+            
+            const gradient = ctx.createLinearGradient(0, 0, can.width, can.height);
+            gradient.addColorStop(0, "#D1B200");
+            gradient.addColorStop(0.5, "#ffffff");
+            gradient.addColorStop(1, "#00ccff");
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, can.width, can.height);
+
+            for(let i = 0; i < 8000; i++) {
+                ctx.fillStyle = Math.random() > 0.5 ? '#1a1a2e' : '#fff';
+                ctx.fillRect(Math.random() * can.width, Math.random() * can.height, 2, 2);
+            }
+
+            const { data } = ctx.getImageData(0, 0, can.width, can.height);
+            const c = new THREE.Color();
+            const total = data.length >> 2;
+            for (let i = 0; i < total; ++i) {
+                mesh.setColorAt(i, c.setRGB(data[i * 4] / 255, data[i * 4 + 1] / 255, data[i * 4 + 2] / 255));
+            }
+            mesh.instanceColor.needsUpdate = true;
+
+            renderer.setAnimationLoop(() => { renderer.render(scene, camera); });
+
+            function resize() {
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+                renderer.setSize(window.innerWidth, window.innerHeight, false);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            const scrollArea = document.getElementById('main-scroll-area');
+            function setCamPos() {
+                const H = scrollArea.scrollHeight - scrollArea.clientHeight;
+                if(H <= 0) return; 
+                const r = scrollArea.scrollTop / H; 
+                const z = initCamaraZ + (targetCameraZ - initCamaraZ) * r;
+                
+                gsap.killTweensOf(camera.position);
+                gsap.to(camera.position, { z: z, duration: 0.5, ease: "power2.out" });
+            }
+            scrollArea.addEventListener('scroll', setCamPos);
+        });
+    </script>
+</body>
+</html>
