@@ -6,34 +6,40 @@
     <title>Consulting & Enterprise Solutions | Aakarsh Nikki</title>
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800"> 
-    <link rel="stylesheet" href="css/bootstrap.min.css">                                                 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">                                                 
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html {
-            width: 100%; height: 100%;
-            background-color: #050508; 
-            color: #e0e0e0; font-family: 'Open Sans', sans-serif;
-            scroll-behavior: smooth; overflow: hidden;
+        
+        body, html { 
+            width: 100%; height: 100%; 
+            background-color: transparent; 
+            color: #e0e0e0; font-family: 'Open Sans', sans-serif; 
+            scroll-behavior: smooth; overflow-x: hidden; 
         }
-
+        
         h1, h2, h3, h4 { color: #fff; font-weight: 700; margin-bottom: 1rem; }
         .text-gold { color: #D1B200 !important; }
         .bg-dark-panel { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(209, 178, 0, 0.1); border-radius: 12px; backdrop-filter: blur(10px); }
 
-        #bg-canvas {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: -2; display: block;
+        #bg-canvas { 
+            position: fixed; top: 0; left: 0; 
+            width: 100vw; height: 100vh; 
+            background-color: #050508; 
+            z-index: 1; 
+            display: block; 
         }
         
-        .bg-overlay {
-            position: fixed; inset: 0; z-index: -1; pointer-events: none;
-            background: linear-gradient(135deg, rgba(31, 30, 38, 0.85) 0%, rgba(13, 12, 17, 0.95) 100%);
+        .bg-overlay { 
+            position: fixed; inset: 0; 
+            z-index: 2; 
+            pointer-events: none; 
+            background: linear-gradient(135deg, rgba(31, 30, 38, 0.4) 0%, rgba(13, 12, 17, 0.6) 100%); 
         }
 
-        .layout-wrapper {
-            display: flex; width: 100vw; height: 100vh; overflow: hidden; position: relative; z-index: 10;
+        .layout-wrapper { 
+            display: flex; width: 100vw; height: 100vh; overflow: hidden; position: relative; 
+            z-index: 10; 
         }
 
         .sidebar {
@@ -64,6 +70,46 @@
             text-shadow: 0 10px 20px rgba(209, 178, 0, 0.3);
         }
 
+        /* -------------------------------------------
+           MOBILE HAMBURGER MENU (Button Three)
+        ------------------------------------------- */
+        .mobile-nav-toggle {
+            display: none; 
+            background: transparent;
+            border: 2px solid var(--button-color);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            padding: 5px;
+            --button-color: #D1B200;
+            overflow: hidden;
+            width: 55px;
+            height: 55px;
+            z-index: 1001;
+        }
+
+        .mobile-nav-toggle .hamburger {
+            transition: translate 1s, rotate 1s;
+            width: 100%; height: 100%;
+        }
+
+        .mobile-nav-toggle[aria-expanded="true"] .hamburger {
+            translate: 2.5px -2.5px;
+            rotate: 0.125turn;
+        }
+
+        .mobile-nav-toggle .line {
+            transition: 1s;
+            stroke-dasharray: 60 31 60 300;
+        }
+
+        .mobile-nav-toggle[aria-expanded="true"] .line {
+            stroke-dasharray: 60 105 60 300;
+            stroke-dashoffset: -90;
+        }
+
+        /* -------------------------------------------
+           MAIN CONTENT
+        ------------------------------------------- */
         .main-content {
             width: 65%; height: 100vh; overflow-y: auto; overflow-x: hidden;
             position: relative; scroll-behavior: smooth;
@@ -96,9 +142,6 @@
             display: flex; align-items: center; justify-content: center; color: #D1B200; margin-bottom: 25px;
         }
 
-        .client-logo { opacity: 0.4; transition: opacity 0.3s ease; filter: grayscale(100%); height: 40px; margin: 20px 30px; }
-        .client-logo:hover { opacity: 1; filter: grayscale(0%); }
-
         .form-control, .form-select {
             background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff;
             padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; width: 100%; transition: border-color 0.3s ease;
@@ -123,15 +166,140 @@
 
         .reveal-up { opacity: 0; visibility: hidden; }
 
+        /* =========================================================
+           3D DIRECTION-AWARE CUBES (Isolated & Golden Slider)
+        ========================================================= */
+        :root {
+            --cube-size: 180px;
+            --cube-duration: 300ms;
+            --cube-ease: ease-out;
+            --cube-perspective: 800px;
+        }
+
+        .client-slider-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 20px 0 40px 0; 
+            scrollbar-width: thin;
+            scrollbar-color: #D1B200 rgba(255,255,255,0.05);
+            /* Smooth touch scrolling on mobile */
+            -webkit-overflow-scrolling: touch; 
+        }
+
+        .client-slider-wrapper::-webkit-scrollbar { height: 8px; }
+        .client-slider-wrapper::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .client-slider-wrapper::-webkit-scrollbar-thumb { background: #D1B200; border-radius: 10px; }
+
+        .client-grid { 
+            display: flex; 
+            flex-wrap: nowrap; 
+            gap: 30px; 
+            width: max-content; 
+            padding: 0 10px;
+        }
+
+        .client-cube {
+            position: relative;
+            flex-shrink: 0; 
+            width: var(--cube-size);
+            height: var(--cube-size);
+            display: inline-block;
+            perspective: var(--cube-perspective);
+            cursor: pointer;
+        }
+
+        .client-cube .w {
+            position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+            pointer-events: none;
+            transform-style: preserve-3d;
+            transform-origin: 50% 50% calc(var(--cube-size) / 2 * -1);
+            will-change: transform;
+            animation: var(--cube-duration) var(--cube-ease) 0ms 1 normal forwards paused;
+        }
+
+        .client-cube .f, .client-cube .b {
+            position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+            color: white;
+            background: #050508; 
+            border: 1px solid rgba(209, 178, 0, 0.4); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .client-cube .f { transform: translate3d(0,0,0); }
+        .client-cube .b { transform: translate3d(0,0,-1px); }
+
+        .client-cube .f svg { width: 80px; height: 80px; fill: #D1B200; transition: filter 0.3s;}
+        .client-cube:hover .f svg { filter: drop-shadow(0 0 15px rgba(209,178,0,0.5)); } 
+        
+        .client-cube .b svg { width: 35px; height: 35px; margin-top: 15px; fill: #D1B200; opacity: 0.6; }
+        .client-cube .b h5 { margin-bottom: 5px; font-weight: 800; font-family: inherit; color: #D1B200;}
+        .client-cube .b p { margin: 0; color: #aaa; font-size: 0.9rem; font-family: inherit;}
+
+        .in-top .b, .out-top .b { transform-origin: 0% 100%; transform: translate3d(0, -100%, 0) rotate3d(1,0,0,90deg); }
+        .in-right .b, .out-right .b { transform-origin: 0% 0%; transform: translate3d(100%, 0, 0) rotate3d(0,1,0,90deg); }
+        .in-bottom .b, .out-bottom .b { transform-origin: 0% 0%; transform: translate3d(0, 100%, 0) rotate3d(-1,0,0,90deg); }
+        .in-left .b, .out-left .b { transform-origin: 100% 0; transform: translate3d(-100%,0,0) rotate3d(0,-1,0,90deg); }
+
+        .in-top .w { animation-name: in-top; animation-play-state: running; }
+        .in-right .w { animation-name: in-right; animation-play-state: running; }
+        .in-bottom .w { animation-name: in-bottom; animation-play-state: running; }
+        .in-left .w { animation-name: in-left; animation-play-state: running; }
+
+        .out-top .w { animation-name: out-top; animation-play-state: running; }
+        .out-right .w { animation-name: out-right; animation-play-state: running; }
+        .out-bottom .w { animation-name: out-bottom; animation-play-state: running; }
+        .out-left .w { animation-name: out-left; animation-play-state: running; }
+
+        @keyframes in-top { from {transform: rotate3d(0,0,0,0deg)} to {transform: rotate3d(-1,0,0,90deg)} }
+        @keyframes out-top { from {transform: rotate3d(-1,0,0,90deg)} to {transform: rotate3d(0,0,0,0deg)} }
+        @keyframes in-right { from {transform: rotate3d(0,0,0,0deg)} to {transform: rotate3d(0,-1,0,90deg)} }
+        @keyframes out-right { from {transform: rotate3d(0,-1,0,90deg)} to {transform: rotate3d(0,0,0,0deg)} }
+        @keyframes in-bottom { from {transform: rotate3d(0,0,0,0deg)} to {transform: rotate3d(1,0,0,90deg)} }
+        @keyframes out-bottom { from {transform: rotate3d(1,0,0,90deg)} to {transform: rotate3d(0,0,0,0deg)} }
+        @keyframes in-left { from {transform: rotate3d(0,0,0,0deg)} to {transform: rotate3d(0,1,0,90deg)} }
+        @keyframes out-left { from {transform: rotate3d(0,1,0,90deg)} to {transform: rotate3d(0,0,0,0deg)} }
+
+        /* =========================================================
+           MOBILE RESPONSIVENESS
+        ========================================================= */
         @media (max-width: 991px) {
-            .layout-wrapper { flex-direction: column; overflow: auto; height: auto; }
-            .sidebar { width: 100%; height: auto; padding: 40px 20px; position: sticky; top: 0; background: rgba(13,12,17,0.9); backdrop-filter: blur(10px); z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.1); }
-            .nav-menu { flex-direction: row; flex-wrap: wrap; gap: 1rem; justify-content: center; }
-            .nav-item { font-size: 1.5rem; }
+            .layout-wrapper { 
+                flex-direction: column; overflow: auto; height: auto; 
+            }
+            .sidebar { 
+                width: 100%; height: auto; padding: 20px; 
+                position: sticky; top: 0; 
+                background: rgba(13,12,17,0.9); backdrop-filter: blur(10px); 
+                z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.1); 
+                flex-direction: row; justify-content: flex-end; align-items: center;
+                flex-wrap: wrap;
+            }
+            
+            .mobile-nav-toggle { display: block; }
+
+            .nav-menu { 
+                display: none; 
+                width: 100%; 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 1.5rem;
+                margin-top: 1rem;
+                padding-bottom: 1rem;
+            }
+            .nav-menu.is-open { display: flex; animation: fadeIn 0.3s ease-in; }
+            
+            .nav-item { font-size: 2rem; }
             .nav-item:hover, .nav-item.active { transform: translateY(-5px) translateX(0); }
+            
             .main-content { width: 100%; height: auto; overflow: visible; }
             section { min-height: auto; padding: 60px 5%; }
             .watermark { display: none; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -143,7 +311,13 @@
     <div class="layout-wrapper">
         
         <nav class="sidebar">
-            <ul class="nav-menu">
+            <button class="mobile-nav-toggle button-three" aria-controls="primary-navigation" aria-expanded="false">
+                <svg stroke="var(--button-color)" fill="none" class="hamburger" viewBox="-10 -10 120 120">
+                    <path class="line" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" d="m 20 40 h 60 a 1 1 0 0 1 0 20 h -60 a 1 1 0 0 1 0 -40 h 30 v 70"></path>
+                </svg>
+            </button>
+
+            <ul class="nav-menu" id="primary-navigation">
                 <li><a href="#intro" class="nav-item active" data-target="intro">Intro</a></li>
                 <li><a href="#services" class="nav-item" data-target="services">Services</a></li>
                 <li><a href="#clients" class="nav-item" data-target="clients">Clients</a></li>
@@ -218,11 +392,93 @@
                 <div class="row mb-5 reveal-up">
                     <div class="col-12">
                         <h5 class="text-muted mb-4 text-uppercase tracking-widest" style="letter-spacing: 2px;">Trusted By</h5>
-                        <div class="d-flex flex-wrap align-items-center gap-4">
-                            <svg class="client-logo" viewBox="0 0 100 30" fill="#fff"><path d="M10,15 L20,5 L30,15 L20,25 Z M40,5 H60 V25 H40 Z M70,15 A10,10 0 1,0 90,15 A10,10 0 1,0 70,15"/></svg>
-                            <svg class="client-logo" viewBox="0 0 100 30" fill="#fff"><circle cx="20" cy="15" r="10"/><rect x="40" y="5" width="20" height="20"/><polygon points="80,5 95,25 65,25"/></svg>
-                            <svg class="client-logo" viewBox="0 0 100 30" fill="#fff"><path d="M0,15 Q25,0 50,15 T100,15 v10 H0 Z"/></svg>
+                        
+                        <div class="client-slider-wrapper">
+                            <div class="client-grid">
+                                <div class="client-cube">
+                                    <div class="w">
+                                        <div class="f"><svg viewBox="0 0 100 30"><path d="M10,15 L20,5 L30,15 L20,25 Z M40,5 H60 V25 H40 Z M70,15 A10,10 0 1,0 90,15 A10,10 0 1,0 70,15"/></svg></div>
+                                        <div class="b">
+                                            <h5>Apex Global</h5><p>Finance</p>
+                                            <svg viewBox="0 0 100 30"><path d="M10,15 L20,5 L30,15 L20,25 Z M40,5 H60 V25 H40 Z M70,15 A10,10 0 1,0 90,15 A10,10 0 1,0 70,15"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="client-cube">
+                                    <div class="w">
+                                        <div class="f"><svg viewBox="0 0 100 30"><circle cx="20" cy="15" r="10"/><rect x="40" y="5" width="20" height="20"/><polygon points="80,5 95,25 65,25"/></svg></div>
+                                        <div class="b">
+                                            <h5>Nexus Med</h5><p>Healthcare</p>
+                                            <svg viewBox="0 0 100 30"><circle cx="20" cy="15" r="10"/><rect x="40" y="5" width="20" height="20"/><polygon points="80,5 95,25 65,25"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="client-cube">
+                                    <div class="w">
+                                        <div class="f"><svg viewBox="0 0 100 30"><path d="M0,15 Q25,0 50,15 T100,15 v10 H0 Z"/></svg></div>
+                                        <div class="b">
+                                            <h5>Vanguard</h5><p>Retail</p>
+                                            <svg viewBox="0 0 100 30"><path d="M0,15 Q25,0 50,15 T100,15 v10 H0 Z"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="client-cube">
+                                    <div class="w">
+                                        <div class="f"><svg viewBox="0 0 100 30"><circle cx="50" cy="15" r="12"/><path d="M10,15 L90,15" stroke="currentColor" stroke-width="2"/></svg></div>
+                                        <div class="b">
+                                            <h5>Synergy</h5><p>Logistics</p>
+                                            <svg viewBox="0 0 100 30"><circle cx="50" cy="15" r="12"/><path d="M10,15 L90,15" stroke="currentColor" stroke-width="2"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="client-cube">
+                                    <div class="w">
+                                        <div class="f"><svg viewBox="0 0 100 30"><polygon points="10,25 50,5 90,25" fill="none" stroke="currentColor" stroke-width="3"/></svg></div>
+                                        <div class="b">
+                                            <h5>Pinnacle</h5><p>Real Estate</p>
+                                            <svg viewBox="0 0 100 30"><polygon points="10,25 50,5 90,25" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="client-cube">
+                                    <div class="w">
+                                        <div class="f"><svg viewBox="0 0 100 30"><rect x="10" y="5" width="80" height="20" rx="10" fill="none" stroke="currentColor" stroke-width="3"/></svg></div>
+                                        <div class="b">
+                                            <h5>Quantum</h5><p>Security</p>
+                                            <svg viewBox="0 0 100 30"><rect x="10" y="5" width="80" height="20" rx="10" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="client-cube">
+                                    <div class="w">
+                                        <div class="f"><svg viewBox="0 0 100 30"><path d="M20,25 L50,5 L80,25 Z M50,25 L50,15" fill="none" stroke="currentColor" stroke-width="3"/></svg></div>
+                                        <div class="b">
+                                            <h5>AeroTech</h5><p>Aviation</p>
+                                            <svg viewBox="0 0 100 30"><path d="M20,25 L50,5 L80,25 Z M50,25 L50,15" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="client-cube">
+                                    <div class="w">
+                                        <div class="f"><svg viewBox="0 0 100 30"><circle cx="30" cy="15" r="8"/><circle cx="70" cy="15" r="8"/><path d="M30,15 L70,15" stroke="currentColor" stroke-width="3"/></svg></div>
+                                        <div class="b">
+                                            <h5>Omni Systems</h5><p>SaaS</p>
+                                            <svg viewBox="0 0 100 30"><circle cx="30" cy="15" r="8"/><circle cx="70" cy="15" r="8"/><path d="M30,15 L70,15" stroke="currentColor" stroke-width="3"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="client-cube">
+                                    <div class="w">
+                                        <div class="f"><svg viewBox="0 0 100 30"><rect x="20" y="5" width="20" height="20"/><rect x="60" y="5" width="20" height="20"/></svg></div>
+                                        <div class="b">
+                                            <h5>DataCore</h5><p>Analytics</p>
+                                            <svg viewBox="0 0 100 30"><rect x="20" y="5" width="20" height="20"/><rect x="60" y="5" width="20" height="20"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -292,17 +548,31 @@
         </main>
     </div>
 
-    <!-- CDNs FOR THREE.JS & GSAP -->
     <script src="three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     
-    <!-- WRAPPED INSIDE DOMContentLoaded TO ENSURE HTML IS RENDERED BEFORE QUERYING -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // UI Setup
             document.getElementById('year').textContent = new Date().getFullYear();
+            
+            // Hamburger Mobile Toggle
+            const navToggle = document.querySelector('.mobile-nav-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            navToggle.addEventListener('click', () => {
+                const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
+                navToggle.setAttribute('aria-expanded', !isExpanded);
+                if (!isExpanded) {
+                    navMenu.classList.add('is-open');
+                } else {
+                    navMenu.classList.remove('is-open');
+                }
+            });
 
-            const scrollArea = document.getElementById('main-scroll-area');
+            // Smooth Scroll Setup depending on viewport
+            const scrollArea = window.innerWidth <= 991 ? window : document.getElementById('main-scroll-area');
             const navLinks = document.querySelectorAll('.nav-item');
 
             navLinks.forEach(link => {
@@ -316,12 +586,16 @@
                             top: targetSection.offsetTop,
                             behavior: 'smooth'
                         });
+                        if (window.innerWidth <= 991) {
+                            navToggle.setAttribute('aria-expanded', 'false');
+                            navMenu.classList.remove('is-open');
+                        }
                     }
                 });
             });
 
             const sections = document.querySelectorAll('section');
-            const observerOptions = { root: scrollArea, rootMargin: '0px', threshold: 0.5 };
+            const observerOptions = { root: window.innerWidth <= 991 ? null : scrollArea, rootMargin: '0px', threshold: 0.5 };
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -335,8 +609,8 @@
 
             sections.forEach(sec => observer.observe(sec));
 
+            // GSAP Scroll Reveal Elements
             gsap.registerPlugin(ScrollTrigger);
-
             const revealElements = document.querySelectorAll('.reveal-up');
             revealElements.forEach((el) => {
                 gsap.fromTo(el, 
@@ -345,29 +619,104 @@
                         autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out",
                         scrollTrigger: {
                             trigger: el,
-                            scroller: "#main-scroll-area", 
+                            scroller: window.innerWidth <= 991 ? window : "#main-scroll-area", 
                             start: "top 85%", 
                             toggleActions: "play none none reverse"
                         }
                     }
                 );
             });
-        });
-    </script>
 
-    <!-- PROCEDURAL 3D BACKGROUND -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const imgRatio = 634 / 951;
+            // 1. DIRECTION-AWARE HOVER LOGIC FOR CUBES
+            class CubeNode {
+                constructor(node) {
+                    this.element = node;
+                    this._bindEvents().update();
+                }
+
+                update() {
+                    this.w = this.element.offsetWidth;
+                    this.h = this.element.offsetHeight;
+                }
+
+                _bindEvents() {
+                    ['_mouseEnterHandler', '_mouseOutHandler'].forEach(fn => this[fn] = this[fn].bind(this));
+                    this.element.addEventListener('mouseenter', this._mouseEnterHandler, false);
+                    this.element.addEventListener('mouseout', this._mouseOutHandler, false);
+                    return this;
+                }
+                
+                _mouseEnterHandler(ev) { this._addClass(ev, 'in'); }
+                _mouseOutHandler(ev) { this._addClass(ev, 'out'); }
+
+                _addClass(ev, state) {
+                    const direction = this._getDirection(ev);
+                    let class_suffix = '';
+
+                    switch (direction) {
+                        case 0: class_suffix = '-top'; break;
+                        case 1: class_suffix = '-right'; break;
+                        case 2: class_suffix = '-bottom'; break;
+                        case 3: class_suffix = '-left'; break;
+                    }
+
+                    this.element.className = 'client-cube'; 
+                    this.element.classList.add(state + class_suffix);
+                }
+
+                _getDirection(ev) {
+                    const bcr = this.element.getBoundingClientRect();
+                    const w = this.w;
+                    const h = this.h;
+                    const x = (ev.clientX - bcr.left - (w / 2) * (w > h ? (h / w) : 1));
+                    const y = (ev.clientY - bcr.top - (h / 2) * (h > w ? (w / h) : 1));
+                    return Math.round(Math.atan2(y, x) / 1.57079633 + 5) % 4;
+                }
+            }
+
+            const cubeElements = document.querySelectorAll('.client-cube');
+            const nodes = [];
+            cubeElements.forEach(node => nodes.push(new CubeNode(node)));
+            window.addEventListener('resize', () => { nodes.forEach(node => node.update()); });
+
+            if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+                cubeElements.forEach((cube, index) => {
+                    ScrollTrigger.create({
+                        trigger: cube,
+                        scroller: window.innerWidth <= 991 ? window : "#main-scroll-area", 
+                        start: "top 80%", 
+                        onEnter: () => {
+                            setTimeout(() => {
+                                cube.className = 'client-cube in-bottom';
+                                setTimeout(() => {
+                                    if (cube.classList.contains('in-bottom')) {
+                                        cube.className = 'client-cube out-bottom'; 
+                                    }
+                                }, 800); 
+                            }, index * 150); 
+                        }
+                    });
+                });
+            }
+
+            // ==========================================
+            // OPTIMIZED 3D PIXEL ENGINE FOR MOBILE
+            // ==========================================
+            const isMobile = window.innerWidth <= 991;
+            const imgUrl = 'img/dev_img.jpg';
+            const imgRatio = 1;
             const targetCameraZ = 180;
             const instanceSize = 1;
             const randRangeZ = 2 * targetCameraZ * 0.99; 
             const initCamaraZ = targetCameraZ / 5;
 
             const canvas = document.getElementById('bg-canvas');
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: !isMobile });
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.5, 1000);
+            
+            // Widen Field of View slightly on mobile so the image isn't cut off
+            const fov = isMobile ? 90 : 75;
+            const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.5, 1000);
             camera.position.set(0, 0, initCamaraZ);
 
             function f(x, y, targetZ) {
@@ -379,82 +728,99 @@
                 return { s, p: new THREE.Vector3(x * s, y * s, targetZ) };
             }
 
-            const mesh = (() => {
-                const nRow = 256;
-                const nCol = nRow * imgRatio | 0;
-                const sz = instanceSize;
+            // CRITICAL MOBILE FIX: Lower resolution on small screens to prevent WebGL crash
+            const nRow = isMobile ? 100 : 200; 
+            const nCol = nRow * imgRatio | 0;
+            const sz = instanceSize * (isMobile ? 2 : 1); // Scale up particle size if rendering fewer particles
 
-                const geom = new THREE.BoxGeometry(sz, sz, sz).translate(0, 0, -.5 * sz);
-                const mat = new THREE.MeshBasicMaterial();
-                const mesh = new THREE.InstancedMesh(geom, mat, nCol * nRow);
+            const geom = new THREE.BoxGeometry(sz, sz, sz).translate(0, 0, -0.5 * sz);
+            const mat = new THREE.MeshBasicMaterial();
+            const mesh = new THREE.InstancedMesh(geom, mat, nCol * nRow);
 
-                for (let i = 0, c = 0; i < nRow; ++i) {
-                    for (let j = 0; j < nCol; ++j) {
-                        const { p, s } = f(
-                            (j - nCol / 2 + 0.5) * sz,
-                            (nRow / 2 - i + 0.5) * sz,
-                            THREE.MathUtils.randFloatSpread(randRangeZ) * sz
-                        );
-                        const m = new THREE.Matrix4().setPosition(p).multiply(new THREE.Matrix4().makeScale(s, s, s));
-                        mesh.setMatrixAt(c, m);
-                        mesh.setColorAt(c, new THREE.Color('white'));
-                        ++c;
-                    }
+            for (let i = 0, c = 0; i < nRow; ++i) {
+                for (let j = 0; j < nCol; ++j) {
+                    const { p, s } = f(
+                        (j - nCol / 2 + 0.5) * sz,
+                        (nRow / 2 - i + 0.5) * sz,
+                        THREE.MathUtils.randFloatSpread(randRangeZ) * sz
+                    );
+                    const m = new THREE.Matrix4().setPosition(p).multiply(new THREE.Matrix4().makeScale(s, s, s));
+                    mesh.setMatrixAt(c, m);
+                    mesh.setColorAt(c, new THREE.Color('#333333')); 
+                    ++c;
                 }
-                mesh.instanceMatrix.needsUpdate = true;
-                mesh.instanceColor.needsUpdate = true;
-                return mesh;
-            })();
+            }
+            mesh.instanceMatrix.needsUpdate = true;
+            mesh.instanceColor.needsUpdate = true;
             scene.add(mesh);
 
-            const can = document.createElement('canvas');
-            can.height = 256;
-            can.width = can.height * imgRatio | 0;
-            const ctx = can.getContext('2d');
-            
-            const gradient = ctx.createLinearGradient(0, 0, can.width, can.height);
-            gradient.addColorStop(0, "#D1B200");
-            gradient.addColorStop(0.5, "#ffffff");
-            gradient.addColorStop(1, "#00ccff");
-            
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, can.width, can.height);
-
-            for(let i = 0; i < 8000; i++) {
-                ctx.fillStyle = Math.random() > 0.5 ? '#1a1a2e' : '#fff';
-                ctx.fillRect(Math.random() * can.width, Math.random() * can.height, 2, 2);
+            const img = new Image();
+            img.onload = () => {
+                const can = document.createElement('canvas');
+                can.height = nRow; can.width = nCol;
+                const ctx = can.getContext('2d');
+                ctx.drawImage(img, 0, 0, can.width, can.height);
+                const { data } = ctx.getImageData(0, 0, can.width, can.height);
+                const c = new THREE.Color();
+                const total = data.length >> 2;
+                for (let i = 0; i < total; ++i) {
+                    mesh.setColorAt(i, c.setRGB(data[i * 4] / 255, data[i * 4 + 1] / 255, data[i * 4 + 2] / 255));
+                }
+                mesh.instanceColor.needsUpdate = true;
             }
-
-            const { data } = ctx.getImageData(0, 0, can.width, can.height);
-            const c = new THREE.Color();
-            const total = data.length >> 2;
-            for (let i = 0; i < total; ++i) {
-                mesh.setColorAt(i, c.setRGB(data[i * 4] / 255, data[i * 4 + 1] / 255, data[i * 4 + 2] / 255));
-            }
-            mesh.instanceColor.needsUpdate = true;
+            img.src = imgUrl;
 
             renderer.setAnimationLoop(() => { renderer.render(scene, camera); });
 
+            // Debounced resize to stop mobile scrolling jitter
+            let resizeTimeout;
             function resize() {
-                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
-                renderer.setSize(window.innerWidth, window.innerHeight, false);
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+                    renderer.setSize(window.innerWidth, window.innerHeight, false);
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                }, 100);
             }
             window.addEventListener('resize', resize);
             resize();
 
-            const scrollArea = document.getElementById('main-scroll-area');
+            // Clamped Camera Math to handle mobile rubber-banding
             function setCamPos() {
-                const H = scrollArea.scrollHeight - scrollArea.clientHeight;
-                if(H <= 0) return; 
-                const r = scrollArea.scrollTop / H; 
-                const z = initCamaraZ + (targetCameraZ - initCamaraZ) * r;
+                let H, r;
+                if (window.innerWidth <= 991) {
+                    H = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    r = window.scrollY / H;
+                } else {
+                    H = scrollArea.scrollHeight - scrollArea.clientHeight;
+                    r = scrollArea.scrollTop / H;
+                }
+                if (H <= 0) return; 
                 
+                // Prevent overscroll math errors on mobile iOS
+                r = Math.max(0, Math.min(1, r));
+                
+                const z = initCamaraZ + (targetCameraZ - initCamaraZ) * r;
                 gsap.killTweensOf(camera.position);
                 gsap.to(camera.position, { z: z, duration: 0.5, ease: "power2.out" });
             }
-            scrollArea.addEventListener('scroll', setCamPos);
+            
+            if (window.innerWidth <= 991) {
+                window.addEventListener('scroll', setCamPos);
+            } else {
+                scrollArea.addEventListener('scroll', setCamPos);
+            }
+            
+            window.addEventListener('resize', () => {
+                window.removeEventListener('scroll', setCamPos);
+                scrollArea.removeEventListener('scroll', setCamPos);
+                if (window.innerWidth <= 991) {
+                    window.addEventListener('scroll', setCamPos);
+                } else {
+                    scrollArea.addEventListener('scroll', setCamPos);
+                }
+            });
         });
     </script>
 </body>
