@@ -398,7 +398,10 @@
                 tl.call(() => {
                     // 1. Prepare elements
                     blindsContainer.style.display = 'flex';
-                    document.getElementById('next-page-placeholder').style.display = 'flex';
+                    // We only display the placeholder if we are NOT redirecting
+                    if (type !== 'consult') {
+                        document.getElementById('next-page-placeholder').style.display = 'flex';
+                    }
                     bootScreen.style.display = 'none';
 
                     // 2. Animate blinds opening
@@ -411,6 +414,11 @@
                             ease: "power2.inOut",
                             onComplete: () => {
                                 blindsContainer.style.display = 'none'; // Clean up DOM
+                                
+                                // 3. Redirect to Consultant page if the path matches
+                                if (type === 'consult') {
+                                    window.location.href = 'consultant1.html';
+                                }
                             }
                         }
                     );
