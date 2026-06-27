@@ -554,10 +554,16 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // UI Setup
+            
+            // ----------------------------------------------------
+            // 1. GLOBAL UI & NAVIGATION SETUP
+            // ----------------------------------------------------
             document.getElementById('year').textContent = new Date().getFullYear();
             
-            // Hamburger Mobile Toggle
+            const isMobile = window.innerWidth <= 991;
+            const scrollArea = isMobile ? window : document.getElementById('main-scroll-area');
+            
+            // Hamburger Toggle
             const navToggle = document.querySelector('.mobile-nav-toggle');
             const navMenu = document.querySelector('.nav-menu');
             
@@ -571,10 +577,8 @@
                 }
             });
 
-            // Smooth Scroll Setup depending on viewport
-            const scrollArea = window.innerWidth <= 991 ? window : document.getElementById('main-scroll-area');
+            // Smooth Scroll Links
             const navLinks = document.querySelectorAll('.nav-item');
-
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -586,6 +590,7 @@
                             top: targetSection.offsetTop,
                             behavior: 'smooth'
                         });
+                        // Close menu on mobile after click
                         if (window.innerWidth <= 991) {
                             navToggle.setAttribute('aria-expanded', 'false');
                             navMenu.classList.remove('is-open');
@@ -594,8 +599,9 @@
                 });
             });
 
+            // ScrollSpy (Active Link Highlighting)
             const sections = document.querySelectorAll('section');
-            const observerOptions = { root: window.innerWidth <= 991 ? null : scrollArea, rootMargin: '0px', threshold: 0.5 };
+            const observerOptions = { root: isMobile ? null : scrollArea, rootMargin: '0px', threshold: 0.5 };
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -609,25 +615,52 @@
 
             sections.forEach(sec => observer.observe(sec));
 
-            // GSAP Scroll Reveal Elements
-            gsap.registerPlugin(ScrollTrigger);
-            const revealElements = document.querySelectorAll('.reveal-up');
-            revealElements.forEach((el) => {
-                gsap.fromTo(el, 
-                    { autoAlpha: 0, y: 50 }, 
-                    { 
-                        autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out",
-                        scrollTrigger: {
-                            trigger: el,
-                            scroller: window.innerWidth <= 991 ? window : "#main-scroll-area", 
-                            start: "top 85%", 
-                            toggleActions: "play none none reverse"
-                        }
-                    }
-                );
-            });
 
-            // 1. DIRECTION-AWARE HOVER LOGIC FOR CUBES
+            // ----------------------------------------------------
+            // 2. GSAP SCROLLTRIGGERS (Reveals & Cubes)
+            // ----------------------------------------------------
+            if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+
+                // General Page Element Reveals
+                document.querySelectorAll('.reveal-up').forEach((el) => {
+                    gsap.fromTo(el, 
+                        { autoAlpha: 0, y: 50 }, 
+                        { 
+                            autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out",
+                            scrollTrigger: {
+                                trigger: el,
+                                scroller: isMobile ? window : "#main-scroll-area", 
+                                start: "top 85%", 
+                                toggleActions: "play none none reverse"
+                            }
+                        }
+                    );
+                });
+
+                // Cube Auto-Reveal Wave on Scroll
+                document.querySelectorAll('.client-cube').forEach((cube, index) => {
+                    ScrollTrigger.create({
+                        trigger: cube,
+                        scroller: isMobile ? window : "#main-scroll-area", 
+                        start: "top 80%", 
+                        onEnter: () => {
+                            setTimeout(() => {
+                                cube.className = 'client-cube in-bottom';
+                                setTimeout(() => {
+                                    if (cube.classList.contains('in-bottom')) {
+                                        cube.className = 'client-cube out-bottom'; 
+                                    }
+                                }, 800); 
+                            }, index * 150); 
+                        }
+                    });
+                });
+            }
+
+            // ----------------------------------------------------
+            // 3. DIRECTION-AWARE CUBE HOVER LOGIC
+            // ----------------------------------------------------
             class CubeNode {
                 constructor(node) {
                     this.element = node;
@@ -674,44 +707,23 @@
                 }
             }
 
-            const cubeElements = document.querySelectorAll('.client-cube');
             const nodes = [];
-            cubeElements.forEach(node => nodes.push(new CubeNode(node)));
+            document.querySelectorAll('.client-cube').forEach(node => nodes.push(new CubeNode(node)));
             window.addEventListener('resize', () => { nodes.forEach(node => node.update()); });
 
-            if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-                cubeElements.forEach((cube, index) => {
-                    ScrollTrigger.create({
-                        trigger: cube,
-                        scroller: window.innerWidth <= 991 ? window : "#main-scroll-area", 
-                        start: "top 80%", 
-                        onEnter: () => {
-                            setTimeout(() => {
-                                cube.className = 'client-cube in-bottom';
-                                setTimeout(() => {
-                                    if (cube.classList.contains('in-bottom')) {
-                                        cube.className = 'client-cube out-bottom'; 
-                                    }
-                                }, 800); 
-                            }, index * 150); 
-                        }
-                    });
-                });
-            }
 
-            // ==========================================
-            // OPTIMIZED 3D PIXEL ENGINE FOR MOBILE
-            // ==========================================
-            const isMobile = window.innerWidth <= 991;
+            // ----------------------------------------------------
+            // 4. ULTRA-OPTIMIZED 3D PIXEL ENGINE
+            // ----------------------------------------------------
             const imgUrl = 'img/dev_img.jpg';
             const imgRatio = 1;
             const targetCameraZ = 180;
-            const instanceSize = 1;
             const randRangeZ = 2 * targetCameraZ * 0.99; 
             const initCamaraZ = targetCameraZ / 5;
 
             const canvas = document.getElementById('bg-canvas');
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: !isMobile });
+            // Antialias off on mobile for huge performance boost
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: !isMobile }); 
             const scene = new THREE.Scene();
             
             // Widen Field of View slightly on mobile so the image isn't cut off
@@ -728,56 +740,65 @@
                 return { s, p: new THREE.Vector3(x * s, y * s, targetZ) };
             }
 
-            // CRITICAL MOBILE FIX: Lower resolution on small screens to prevent WebGL crash
-            const nRow = isMobile ? 100 : 200; 
+            // CRITICAL MOBILE FIX: Drastically cut rows on mobile (from 150 -> 50)
+            const nRow = isMobile ? 50 : 150; 
             const nCol = nRow * imgRatio | 0;
-            const sz = instanceSize * (isMobile ? 2 : 1); // Scale up particle size if rendering fewer particles
+            
+            // Scale up particle size if rendering fewer particles so image looks solid
+            const baseSize = 1;
+            const sz = isMobile ? baseSize * 3 : baseSize * 1.5; 
 
-            const geom = new THREE.BoxGeometry(sz, sz, sz).translate(0, 0, -0.5 * sz);
-            const mat = new THREE.MeshBasicMaterial();
-            const mesh = new THREE.InstancedMesh(geom, mat, nCol * nRow);
+            // Defer 3D math so HTML loads instantly without freezing phone CPUs
+            setTimeout(() => {
+                const geom = new THREE.BoxGeometry(sz, sz, sz).translate(0, 0, -0.5 * sz);
+                const mat = new THREE.MeshBasicMaterial();
+                const mesh = new THREE.InstancedMesh(geom, mat, nCol * nRow);
 
-            for (let i = 0, c = 0; i < nRow; ++i) {
-                for (let j = 0; j < nCol; ++j) {
-                    const { p, s } = f(
-                        (j - nCol / 2 + 0.5) * sz,
-                        (nRow / 2 - i + 0.5) * sz,
-                        THREE.MathUtils.randFloatSpread(randRangeZ) * sz
-                    );
-                    const m = new THREE.Matrix4().setPosition(p).multiply(new THREE.Matrix4().makeScale(s, s, s));
-                    mesh.setMatrixAt(c, m);
-                    mesh.setColorAt(c, new THREE.Color('#333333')); 
-                    ++c;
+                for (let i = 0, c = 0; i < nRow; ++i) {
+                    for (let j = 0; j < nCol; ++j) {
+                        const { p, s } = f(
+                            (j - nCol / 2 + 0.5) * sz,
+                            (nRow / 2 - i + 0.5) * sz,
+                            THREE.MathUtils.randFloatSpread(randRangeZ) * sz
+                        );
+                        const m = new THREE.Matrix4().setPosition(p).multiply(new THREE.Matrix4().makeScale(s, s, s));
+                        mesh.setMatrixAt(c, m);
+                        mesh.setColorAt(c, new THREE.Color('#111111')); // Dark gray default
+                        ++c;
+                    }
                 }
-            }
-            mesh.instanceMatrix.needsUpdate = true;
-            mesh.instanceColor.needsUpdate = true;
-            scene.add(mesh);
-
-            const img = new Image();
-            img.onload = () => {
-                const can = document.createElement('canvas');
-                can.height = nRow; can.width = nCol;
-                const ctx = can.getContext('2d');
-                ctx.drawImage(img, 0, 0, can.width, can.height);
-                const { data } = ctx.getImageData(0, 0, can.width, can.height);
-                const c = new THREE.Color();
-                const total = data.length >> 2;
-                for (let i = 0; i < total; ++i) {
-                    mesh.setColorAt(i, c.setRGB(data[i * 4] / 255, data[i * 4 + 1] / 255, data[i * 4 + 2] / 255));
-                }
+                mesh.instanceMatrix.needsUpdate = true;
                 mesh.instanceColor.needsUpdate = true;
-            }
-            img.src = imgUrl;
+                scene.add(mesh);
 
-            renderer.setAnimationLoop(() => { renderer.render(scene, camera); });
+                const img = new Image();
+                img.onload = () => {
+                    const can = document.createElement('canvas');
+                    can.height = nRow; can.width = nCol;
+                    // willReadFrequently optimizes memory usage for Image pixel extraction
+                    const ctx = can.getContext('2d', { willReadFrequently: true });
+                    ctx.drawImage(img, 0, 0, can.width, can.height);
+                    
+                    const { data } = ctx.getImageData(0, 0, can.width, can.height);
+                    const c = new THREE.Color();
+                    const total = data.length >> 2;
+                    for (let i = 0; i < total; ++i) {
+                        mesh.setColorAt(i, c.setRGB(data[i * 4] / 255, data[i * 4 + 1] / 255, data[i * 4 + 2] / 255));
+                    }
+                    mesh.instanceColor.needsUpdate = true;
+                }
+                img.src = imgUrl;
 
-            // Debounced resize to stop mobile scrolling jitter
+                renderer.setAnimationLoop(() => { renderer.render(scene, camera); });
+            }, 100); 
+
+            // Handle Resizing smoothly
             let resizeTimeout;
             function resize() {
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(() => {
-                    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+                    // Limit pixel ratio to 1 on mobile to stop GPU overload from Retina screens
+                    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 2)); 
                     renderer.setSize(window.innerWidth, window.innerHeight, false);
                     camera.aspect = window.innerWidth / window.innerHeight;
                     camera.updateProjectionMatrix();
@@ -786,7 +807,7 @@
             window.addEventListener('resize', resize);
             resize();
 
-            // Clamped Camera Math to handle mobile rubber-banding
+            // Handle 3D Camera Scroll Tracking
             function setCamPos() {
                 let H, r;
                 if (window.innerWidth <= 991) {
@@ -798,29 +819,29 @@
                 }
                 if (H <= 0) return; 
                 
-                // Prevent overscroll math errors on mobile iOS
+                // Clamp scroll math to stop mobile "Rubber-Banding" from destroying the camera
                 r = Math.max(0, Math.min(1, r));
                 
                 const z = initCamaraZ + (targetCameraZ - initCamaraZ) * r;
                 gsap.killTweensOf(camera.position);
-                gsap.to(camera.position, { z: z, duration: 0.5, ease: "power2.out" });
+                gsap.to(camera.position, { z: z, duration: 0.5, ease: "power2.out", overwrite: "auto" });
             }
             
-            if (window.innerWidth <= 991) {
-                window.addEventListener('scroll', setCamPos);
+            // Bind passive listener for buttery smooth scrolling
+            if (isMobile) {
+                window.addEventListener('scroll', setCamPos, { passive: true });
             } else {
-                scrollArea.addEventListener('scroll', setCamPos);
+                scrollArea.addEventListener('scroll', setCamPos, { passive: true });
             }
             
+            // Hard reload if device is rotated crossing the mobile/desktop boundary
             window.addEventListener('resize', () => {
-                window.removeEventListener('scroll', setCamPos);
-                scrollArea.removeEventListener('scroll', setCamPos);
-                if (window.innerWidth <= 991) {
-                    window.addEventListener('scroll', setCamPos);
-                } else {
-                    scrollArea.addEventListener('scroll', setCamPos);
+                const currentlyMobile = window.innerWidth <= 991;
+                if (currentlyMobile !== isMobile) {
+                    location.reload(); 
                 }
             });
+
         });
     </script>
 </body>
