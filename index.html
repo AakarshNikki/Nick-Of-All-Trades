@@ -16,6 +16,22 @@
 
 <body>
     <div id="vita-lock-screen">
+        <div class="blob-container">
+            <svg id="blob-1" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <defs>
+                    <clipPath id="mask">
+                        <path id="path-1"/>
+                    </clipPath>
+                </defs>
+                <path id="path-2" fill="rgba(209, 178, 0, 0.15)" />
+                
+                <g clip-path="url(#mask)">
+                    <image id="random-blob-img" href="" width="800" height="800" preserveAspectRatio="xMidYMid slice" />
+                </g>
+            </svg>
+            <div class="blob-play" id="emoji-btn">😀</div>
+        </div>
+
         <div class="vita-border"></div>
         <div class="peel-indicator">
             <i style="display:inline-flex; align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512" fill="currentColor"><path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 402.7 54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg></i>
@@ -26,6 +42,8 @@
             <div id="vita-date">Month 00 (Day)</div>
         </div>
     </div>
+    
+    <div id="vita-flap"></div>
     
     <div id="vita-flap"></div>
 
@@ -246,12 +264,75 @@
     <script src="js/main.js"></script>  
     
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            gsap.set(".tm-nav-link", { transition: "none", borderColor: "transparent", background: "transparent", boxShadow: "none" });
+        // ==========================================
+        // 1. SUPAH BLOB MASK CLASS (Defined globally)
+        // ==========================================
+        class SupahBlob {
+            constructor(obj) {
+                if (!obj.el) return;
+                this.el = obj.el;
+                this.segments = obj.segments || 8;
+                this.centerX = obj.centerX || 400;
+                this.centerY = obj.centerY || 400;
+                this.minRadius = obj.minRadius || 300;
+                this.maxRadius = obj.maxRadius || 380;
+                this.minDuration = obj.minDuration || 1;
+                this.maxDuration = obj.maxDuration || 2;
+                this.init();
+            }
             
+            init() {
+                this.points = [];
+                const slice = (Math.PI * 2) / this.segments;
+                const tl = new gsap.timeline({ onUpdate: () => { this.update(); } });
+                
+                for (let i = 0; i < this.segments; i++) {
+                    const angle = slice * i;
+                    const duration = gsap.utils.random(this.minDuration, this.maxDuration);
+                    const p = {
+                        x: this.centerX + (Math.cos(angle) * this.minRadius),
+                        y: this.centerY + (Math.sin(angle) * this.minRadius),
+                    };
+                    const tween = gsap.to(p, {
+                        duration,
+                        x: this.centerX + Math.cos(angle) * this.maxRadius,
+                        y: this.centerY + Math.sin(angle) * this.maxRadius,
+                        ease: 'sine.inOut', repeat: -1, yoyo: true,
+                    });
+                    tl.add(tween, -duration);
+                    this.points.push(p);
+                }
+            }
+                
+            update() { this.el.setAttribute('d', this.createPath()); }
+            
+            createPath() {
+                const data = this.points;
+                const size = this.points.length;
+                let path = `M${data[0].x} ${data[0].y} C`;
+                for (let i = 0; i < size; i++) {
+                    const p0 = data[(i - 1 + size) % size];
+                    const p1 = data[i];
+                    const p2 = data[(i + 1) % size];
+                    const p3 = data[(i + 2) % size];
+                    const x1 = p1.x + (p2.x - p0.x) * 0.15;
+                    const y1 = p1.y + (p2.y - p0.y) * 0.15;
+                    const x2 = p2.x - (p3.x - p1.x) * 0.15;
+                    const y2 = p2.y - (p3.y - p1.y) * 0.15;
+                    path += ` ${x1} ${y1} ${x2} ${y2} ${p2.x} ${p2.y}`;
+                }
+                return `${path}z`;
+            }
+        }
+
+        // ==========================================
+        // 2. MAIN WEBSITE INITIALIZATION
+        // ==========================================
+        document.addEventListener("DOMContentLoaded", () => {
+            // --- UI Setup & Text Gravity ---
+            gsap.set(".tm-nav-link", { transition: "none", borderColor: "transparent", background: "transparent", boxShadow: "none" });
             gsap.set(".tm-nav-icon.front-face, .tm-nav-text.front-face", { transition: "none", opacity: 0, scale: 0, z: 20 });
             gsap.set(".tm-nav-icon.back-face, .tm-nav-text.back-face", { transition: "none", opacity: 0, scale: 0, rotationY: 180, z: 20 });
-            
             gsap.set(".tm-main-content", { transition: "none", scale: 1.05, filter: "blur(5px)" });
             
             document.documentElement.classList.add("js-ready");
@@ -261,63 +342,46 @@
                 const text = titleText.innerText.trim();
                 let newHTML = "";
                 text.split("").forEach(char => {
-                    if (char === " ") {
-                        newHTML += "&nbsp;";
-                    } else {
-                        newHTML += `<span class="gravity-char" style="display: inline-block; opacity: 0; transform: translateY(-200px);">${char}</span>`;
-                    }
+                    if (char === " ") newHTML += "&nbsp;";
+                    else newHTML += `<span class="gravity-char" style="display: inline-block; opacity: 0; transform: translateY(-200px);">${char}</span>`;
                 });
                 titleText.innerHTML = newHTML;
             }
 
             function playRevealSequence() {
                 gsap.utils.toArray('.gravity-char').forEach(ch => {
-                    gsap.to(ch, {
-                        y: 0, opacity: 1, duration: 0.8, ease: "bounce.out", delay: Math.random() * 0.5
-                    });
+                    gsap.to(ch, { y: 0, opacity: 1, duration: 0.8, ease: "bounce.out", delay: Math.random() * 0.5 });
                 });
 
                 const subHeading = document.getElementById("sub-heading");
                 if (subHeading) {
-                    gsap.fromTo(subHeading, 
-                        { x: -200, opacity: 0 }, 
-                        { x: 0, opacity: 1, duration: 1, ease: "power2.out", delay: 1.2 }
-                    );
+                    gsap.fromTo(subHeading, { x: -200, opacity: 0 }, { x: 0, opacity: 1, duration: 1, ease: "power2.out", delay: 1.2 });
                 }
 
-                gsap.delayedCall(2.2, () => {
-                    bubbleTl.play();
-                });
+                gsap.delayedCall(2.2, () => { bubbleTl.play(); });
 
                 const pen = document.getElementById("hero-pen");
                 if (pen) {
                     gsap.fromTo(pen, 
                         { x: -150, opacity: 0, rotation: -15 }, 
-                        { 
-                            x: 0, opacity: 1, rotation: 0, duration: 1.2, ease: "back.out(1.5)", delay: 4.2, 
-                            onComplete: () => {
-                                gsap.to(pen, { y: -8, duration: 1.5, ease: "sine.inOut", yoyo: true, repeat: -1 });
-                            }
+                        { x: 0, opacity: 1, rotation: 0, duration: 1.2, ease: "back.out(1.5)", delay: 4.2, 
+                            onComplete: () => { gsap.to(pen, { y: -8, duration: 1.5, ease: "sine.inOut", yoyo: true, repeat: -1 }); }
                         }
                     );
                 }
             }
 
+            // --- Mouse Shadow & Footer ---
             const shadowOffset = 30;
-            
             function updateTextShadow(x, y, maxX, maxY) {
                 if (!titleText || !isUnlocked) return;
-                
                 const shadowX = Math.round((x / maxX * shadowOffset) - (shadowOffset / 2));
                 const shadowY = Math.round((y / maxY * shadowOffset) - (shadowOffset / 2));
                 const hue = Math.round((x / maxX) * 360);
-                
                 titleText.style.textShadow = `${shadowX}px ${shadowY}px 0 hsl(${hue}, 80%, 50%, 0.3)`;
             }
 
-            window.addEventListener("mousemove", (e) => {
-                updateTextShadow(e.clientX, e.clientY, window.innerWidth, window.innerHeight);
-            });
+            window.addEventListener("mousemove", (e) => { updateTextShadow(e.clientX, e.clientY, window.innerWidth, window.innerHeight); });
 
             function setupFooter() {
                 const headerContainer = document.querySelector('.tm-site-header-container');
@@ -329,11 +393,11 @@
                     else { main.classList.remove('tm-footer-relative'); }
                 }
             }
-
             setupFooter();
             window.addEventListener('resize', setupFooter);
             document.querySelectorAll('.tm-current-year').forEach(el => el.textContent = new Date().getFullYear());  
 
+            // --- Bubble Unlocking Animation ---
             const bubbleTl = gsap.timeline({ paused: true });
             const links = document.querySelectorAll(".tm-nav-link");
 
@@ -346,16 +410,12 @@
                     if(bubble) bubble.classList.add("animate-bubble");
                 }, null, staggerTime);
 
-                bubbleTl.call(() => {
-                    link.closest('.product').classList.remove('is-locked');
-                }, null, popTime);
+                bubbleTl.call(() => { link.closest('.product').classList.remove('is-locked'); }, null, popTime);
 
                 bubbleTl.to(link, {
                     borderColor: "#D1B200", 
                     boxShadow: "inset -10px -10px 20px rgba(0,0,0,0.9), inset 10px 10px 20px rgba(255,255,255,0.1), 0 15px 35px rgba(0,0,0,0.8), 0 0 15px rgba(209, 178, 0, 0.2)", 
-                    duration: 0.4,
-                    ease: "power2.out",
-                    onComplete: function() { gsap.set(link, { clearProps: "all" }); }
+                    duration: 0.4, ease: "power2.out", onComplete: function() { gsap.set(link, { clearProps: "all" }); }
                 }, popTime);
 
                 bubbleTl.to(link.querySelectorAll(".front-face"), {
@@ -368,25 +428,21 @@
 
                 bubbleTl.to(link.querySelectorAll(".back-face"), {
                     opacity: 1, scale: 1, z: 20, rotationY: 180, duration: 0.6, ease: "back.out(1.7)",
-                    onComplete: function() { 
-                        gsap.set(this.targets(), { clearProps: "all" }); 
-                    }
+                    onComplete: function() { gsap.set(this.targets(), { clearProps: "all" }); }
                 }, popTime);
             });
 
+            // --- 3D Hover Effects (Bubbles & WhatsApp) ---
             document.querySelectorAll(".product").forEach((product) => {
                 const link = product.querySelector(".tm-nav-link");
                 const frontElements = product.querySelectorAll(".front-face");
 
                 product.addEventListener("pointermove", (e) => {
                     if (product.classList.contains("is-locked") || product.classList.contains("is-spinning")) return;
-                    
                     product.dataset.isDragging = "true";
-
                     const rect = product.getBoundingClientRect();
                     const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
                     const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-
                     gsap.to(link, { rotationY: x * 25, rotationX: -y * 25, ease: "power1.out", duration: 0.3 });
                     gsap.to(frontElements, { x: x * 10, y: y * 10, ease: "power1.out", duration: 0.3 });
                 });
@@ -394,34 +450,26 @@
                 product.addEventListener("pointerleave", () => {
                     product.dataset.isDragging = "false";
                     if (product.classList.contains("is-locked") || product.classList.contains("is-spinning")) return;
-                    
                     gsap.to(link, { rotationY: 0, rotationX: 0, ease: "elastic.out(1, 0.4)", duration: 0.8 });
                     gsap.to(frontElements, { x: 0, y: 0, ease: "elastic.out(1, 0.4)", duration: 0.8 });
                 });
-                
                 product.addEventListener("pointerup", () => product.dataset.isDragging = "false");
                 product.addEventListener("pointercancel", () => product.dataset.isDragging = "false");
             });
 
-            // ==========================================
-            // WHATSAPP CAPSULE - EVENT DELEGATION
-            // ==========================================
             document.addEventListener("pointermove", (e) => {
                 const wrapper = e.target.closest(".wa-capsule-wrapper");
                 if (wrapper) {
                     const capsule = wrapper.querySelector(".wa-capsule");
                     const innerElements = wrapper.querySelectorAll("i, span");
-                    
                     if (wrapper.dataset.isHovered !== "true") {
                         wrapper.dataset.isHovered = "true";
                         gsap.to(capsule, { filter: "brightness(1.2) drop-shadow(0 0 15px rgba(37, 211, 102, 0.6))", duration: 0.3 });
                         gsap.to(innerElements, { z: 30, scale: 1.15, duration: 0.3 });
                     }
-
                     const rect = wrapper.getBoundingClientRect();
                     const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
                     const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-
                     gsap.to(capsule, { rotationY: x * 20, rotationX: -y * 20, ease: "power1.out", duration: 0.3 });
                     gsap.to(innerElements, { x: x * 5, y: y * 5, ease: "power1.out", duration: 0.3 });
                 }
@@ -433,33 +481,28 @@
                     wrapper.dataset.isHovered = "false";
                     const capsule = wrapper.querySelector(".wa-capsule");
                     const innerElements = wrapper.querySelectorAll("i, span");
-
                     gsap.to(capsule, { rotationY: 0, rotationX: 0, filter: "brightness(1) drop-shadow(0 0 0px rgba(37, 211, 102, 0))", ease: "elastic.out(1, 0.4)", duration: 0.8 });
                     gsap.to(innerElements, { x: 0, y: 0, z: 20, scale: 1, ease: "elastic.out(1, 0.4)", duration: 0.8 });
                 }
             });
-
             document.addEventListener("pointerdown", (e) => {
                 const wrapper = e.target.closest(".wa-capsule-wrapper");
                 if (wrapper) gsap.to(wrapper.querySelector(".wa-capsule"), { scale: 0.95, duration: 0.1 });
             });
-
             document.addEventListener("pointerup", (e) => {
                 const wrapper = e.target.closest(".wa-capsule-wrapper");
                 if (wrapper) gsap.to(wrapper.querySelector(".wa-capsule"), { scale: 1, ease: "back.out(1.5)", duration: 0.4 });
             });
-            
             document.addEventListener("pointercancel", (e) => {
                 const wrapper = e.target.closest(".wa-capsule-wrapper");
                 if (wrapper) gsap.to(wrapper.querySelector(".wa-capsule"), { scale: 1, ease: "back.out(1.5)", duration: 0.4 });
             });
 
+            // --- Gyroscope ---
             window.addEventListener("deviceorientation", (e) => {
                 if (e.gamma === null || e.beta === null) return; 
-
                 let gamma = Math.min(Math.max(e.gamma || 0, -45), 45); 
                 let beta = Math.min(Math.max(e.beta || 0, -45), 45);
-
                 const pseudoX = ((gamma + 45) / 90) * window.innerWidth;
                 const pseudoY = ((beta + 45) / 90) * window.innerHeight;
                 updateTextShadow(pseudoX, pseudoY, window.innerWidth, window.innerHeight);
@@ -467,27 +510,49 @@
                 if (!isUnlocked) return;
                 const xTilt = gamma / 45; 
                 const yTilt = beta / 45;  
-
                 document.querySelectorAll(".product").forEach((product) => {
-                    if (product.classList.contains("is-locked") || product.classList.contains("is-spinning")) return;
-                    if (product.dataset.isDragging === "true") return;
-
+                    if (product.classList.contains("is-locked") || product.classList.contains("is-spinning") || product.dataset.isDragging === "true") return;
                     const link = product.querySelector(".tm-nav-link");
                     const frontElements = product.querySelectorAll(".front-face");
-
                     gsap.to(link, { rotationY: xTilt * 25, rotationX: -yTilt * 25, ease: "power1.out", duration: 0.3 });
                     gsap.to(frontElements, { x: xTilt * 10, y: yTilt * 10, z: 40, ease: "power1.out", duration: 0.3 });
                 });
-
                 document.querySelectorAll(".wa-capsule-wrapper").forEach((wrapper) => {
                     if (wrapper.dataset.isHovered === "true") return; 
                     const capsule = wrapper.querySelector(".wa-capsule");
                     const innerElements = wrapper.querySelectorAll("i, span");
-
                     gsap.to(capsule, { rotationY: xTilt * 20, rotationX: -yTilt * 20, ease: "power1.out", duration: 0.3 });
                     gsap.to(innerElements, { x: xTilt * 5, y: yTilt * 5, ease: "power1.out", duration: 0.3 });
                 });
             });
+
+            // ==========================================
+            // 3. BLOB LOCK SCREEN LOGIC
+            // ==========================================
+            const blobImages = [
+                "https://images.unsplash.com/photo-1595857819837-1c820f33e62d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1534&q=80",
+                "https://images.unsplash.com/photo-1595719078597-f8ba9cc6ae72?ixlib=rb-1.2.1&auto=format&fit=crop&w=1533&q=80",
+                "https://images.unsplash.com/photo-1462804993656-fac4ff489837?ixlib=rb-1.2.1&auto=format&fit=crop&w=3150&q=80"
+            ];
+            const happyEmojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😋', '😛', '😝', '😜', '🤪', '🥳', '😎'];
+            
+            const randomImg = blobImages[Math.floor(Math.random() * blobImages.length)];
+            const randomEmoji = happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
+            const imgEl = document.getElementById('random-blob-img');
+            const emojiEl = document.getElementById('emoji-btn');
+            
+            if (imgEl && emojiEl) {
+                imgEl.setAttribute('href', randomImg); 
+                imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', randomImg);
+                emojiEl.innerText = randomEmoji;
+            }
+
+            const path1 = document.querySelector('#path-1');
+            const path2 = document.querySelector('#path-2');
+            if (path1 && path2) {
+                new SupahBlob({ el: path1, segments: 9, centerX: 400, centerY: 400, minRadius: 300, maxRadius: 380, minDuration: 1, maxDuration: 3 });
+                new SupahBlob({ el: path2, segments: 9, centerX: 400, centerY: 400, minRadius: 320, maxRadius: 400, minDuration: 2, maxDuration: 3 });
+            }
 
             const lockScreen = document.getElementById('vita-lock-screen');
             const flap = document.getElementById('vita-flap');
@@ -502,10 +567,8 @@
                 hours = hours % 12;
                 hours = hours ? hours : 12; 
                 let minutes = now.getMinutes().toString().padStart(2, '0');
-                
                 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                
                 document.getElementById('vita-time').innerText = `${hours}:${minutes} ${ampm}`;
                 document.getElementById('vita-date').innerText = `${months[now.getMonth()]} ${now.getDate()} (${days[now.getDay()]})`;
             }
@@ -517,24 +580,25 @@
                 flap.style.clipPath = `polygon(calc(100% - ${peelState.d}px) 0%, 100% ${peelState.d}px, calc(100% - ${peelState.d}px) ${peelState.d}px)`;
             }
 
-            gsap.to(peelState, {
-                d: 80, duration: 0.5, ease: "power2.out", delay: 1, yoyo: true, repeat: 1, onUpdate: renderPeel
-            });
+            gsap.to(peelState, { d: 80, duration: 0.5, ease: "power2.out", delay: 1, yoyo: true, repeat: 1, onUpdate: renderPeel });
 
+            // 1. The original, working permission request block
             lockScreen.addEventListener('pointerdown', (e) => {
                 if (isUnlocked) return;
                 isDragging = true;
                 gsap.killTweensOf(peelState);
                 
                 try {
+                    // This initial screen touch perfectly satisfies Apple's user-gesture requirement
                     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                         DeviceOrientationEvent.requestPermission().catch(() => {}); 
                     }
                 } catch(err) {
-                    console.log("Gyroscope disabled or unavailable on this device.");
+                    console.log("Gyroscope disabled or unavailable.");
                 }
             });
 
+            // 2. The standard peel drag mechanics
             window.addEventListener('pointermove', (e) => {
                 if (!isDragging || isUnlocked) return;
                 let pullDistance = (window.innerWidth - e.clientX + e.clientY) / 1.5;
@@ -543,6 +607,7 @@
                 renderPeel();
             });
 
+            // 3. The release and unlock mechanics
             window.addEventListener('pointerup', (e) => {
                 if (!isDragging || isUnlocked) return;
                 isDragging = false;
@@ -565,16 +630,11 @@
                         }
                     });
                 } else {
-                    gsap.to(peelState, {
-                        d: 0, duration: 0.6, ease: "elastic.out(1, 0.6)", onUpdate: renderPeel
-                    });
+                    gsap.to(peelState, { d: 0, duration: 0.6, ease: "elastic.out(1, 0.6)", onUpdate: renderPeel });
                 }
             });
 
-            // ==========================================
-            // MODAL CLOSE BUTTON FALLBACK
-            // Replaces the FontAwesome close button built by main.js
-            // ==========================================
+            // Modal Close Button Fallback
             const closeBtnObserver = new MutationObserver(() => {
                 const closeIcon = document.querySelector('.tm-fa-close');
                 if (closeIcon && closeIcon.tagName.toLowerCase() === 'i' && !closeIcon.querySelector('svg')) {
@@ -587,8 +647,7 @@
                 }
             });
             closeBtnObserver.observe(document.body, { childList: true, subtree: true });
-
         });
-    </script>             
+    </script>            
 </body>
 </html>

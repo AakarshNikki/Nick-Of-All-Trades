@@ -121,32 +121,123 @@ html:not(.js-ready) .tm-main-content { transform: scale(1.05); filter: blur(5px)
 }
 
 /* =====================================================================
-   PS VITA PEEL LOCK SCREEN
+   PS VITA PEEL LOCK SCREEN (INTEGRATED WITH BLOB)
 ===================================================================== */
 #vita-lock-screen {
     position: fixed; inset: 0; z-index: 999998;
-    background: url('../img/img-bg2.jpeg') center/cover no-repeat; 
+    background: #111; /* Dark background instead of the static image */
     clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); 
     touch-action: none; cursor: grab;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 #vita-lock-screen:active { cursor: grabbing; }
 
-.vita-border { position: absolute; inset: 15px; border: 2px solid rgba(255,255,255,0.7); border-radius: 25px; pointer-events: none; }
-
-#vita-flap {
-    position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 999999; background: #0078d7; 
-    clip-path: polygon(100% 0%, 100% 0%, 100% 0%); filter: drop-shadow(-10px 10px 25px rgba(0,0,0,0.6)); pointer-events: none;
+.vita-border { 
+    position: absolute; inset: 15px; border: 2px solid rgba(255,255,255,0.7); 
+    border-radius: 25px; pointer-events: none; z-index: 20; 
 }
 
-.vita-clock { position: absolute; bottom: 40px; left: 40px; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.8); pointer-events: none; }
+#vita-flap {
+    position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 999999; 
+    
+    /* Matrix Background Settings */
+    background-color: #000000;
+    background-image: url('../img/matrix.gif'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    clip-path: polygon(100% 0%, 100% 0%, 100% 0%); 
+    
+    /* Swapped the black shadow for a neon green glow */
+    filter: drop-shadow(-10px 10px 25px rgba(0, 255, 65, 0.8)); 
+    pointer-events: none;
+}
+
+.vita-clock { 
+    position: absolute; bottom: 40px; left: 40px; color: white; 
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8); pointer-events: none; z-index: 20; 
+}
 .vita-clock #vita-time { font-size: 6rem; font-weight: 300; line-height: 1; letter-spacing: -2px; }
 .vita-clock #vita-date { font-size: 1.5rem; font-weight: 400; margin-top: 10px; color: #f0f0f0; }
 
 .peel-indicator {
     position: absolute; top: 25px; right: 25px; color: white; font-size: 2rem;
-    animation: peelBounce 1.5s infinite; pointer-events: none;
+    animation: peelBounce 1.5s infinite; pointer-events: none; z-index: 20;
 }
-@keyframes peelBounce { 0% { transform: translate(0, 0); opacity: 1; } 50% { transform: translate(-10px, 10px); opacity: 0.5; } 100% { transform: translate(0, 0); opacity: 1; } }
+@keyframes peelBounce { 
+    0% { transform: translate(0, 0); opacity: 1; } 
+    50% { transform: translate(-10px, 10px); opacity: 0.5; } 
+    100% { transform: translate(0, 0); opacity: 1; } 
+}
+
+/* =====================================================================
+   BLOB SPECIFIC CSS
+===================================================================== */
+/* 1. Increased the scale values so the blob is bigger on phones/tablets */
+:root { --blob-scale: 1; }
+@media (max-width: 900px) { :root { --blob-scale: 0.85; } }
+@media (max-width: 700px) { :root { --blob-scale: 0.68; } }
+@media (max-width: 500px) { :root { --blob-scale: 0.55; } } /* Bigger on phones */
+
+.blob-container {
+  position: relative;
+  z-index: 1;
+  width: 800px;
+  height: 800px;
+  transform: scale(var(--blob-scale));
+  pointer-events: none; 
+}
+
+.blob-container svg {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.blob-play {
+  position: absolute;
+  z-index: 10;
+  
+  /* 2. Tuned to 11% to push it outward for a ~25% overlap */
+  bottom: 11%;
+  left: 11%;
+  
+  transform: rotate(-20deg);
+  width: 120px;
+  height: 120px;
+  background: #D1B200; 
+  box-shadow: 0 10px 20px -6px rgba(209, 178, 0, 0.5);
+  border-radius: 50%;
+  color: #111;
+  font-size: 3.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+}
+
+@keyframes emojiPulse {
+    0% { transform: scale(1.2); }
+    50% { transform: scale(1); }
+    100% { transform: scale(1.2); }
+}
+
+.blob-play:before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 0 10px rgba(255, 255, 255, .3);
+  border-radius: 50%;
+  animation: emojiPulse 3s infinite ease-in-out;
+}
 
 /* =====================================================================
    GLOBAL FIXED MODAL ENGINE 
