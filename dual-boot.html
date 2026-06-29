@@ -327,7 +327,7 @@
         const bootSequences = {
             dev: [
                 "NICK_OS [Version 2.0.26]",
-                "(c) Mente-Fabrica Corporation. All rights reserved.",
+                "(c) Nick Of All Trades. All rights reserved.",
                 "",
                 "> Compiling WebAssembly Modules...",
                 "> Loading Godot Engine Canvas...",
@@ -400,7 +400,7 @@
                     blindsContainer.style.display = 'flex';
                     // We only display the placeholder if we are NOT redirecting
                     if (type !== 'consult') {
-                        document.getElementById('next-page-placeholder').style.display = 'flex';
+                         window.location.href = 'developer.html';
                     }
                     bootScreen.style.display = 'none';
 
@@ -417,7 +417,7 @@
                                 
                                 // 3. Redirect to Consultant page if the path matches
                                 if (type === 'consult') {
-                                    window.location.href = 'consultant1.html';
+                                    window.location.href = 'consultant.html';
                                 }
                             }
                         }
