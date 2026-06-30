@@ -148,13 +148,17 @@
         }
         .close-modal { margin-top: 20px; padding: 10px 20px; background: #333; color: white; border: none; cursor: pointer; border-radius: 4px; }
 
-        /* Mobile Touch Controls */
-        #touch-controls { position: fixed; bottom: 20px; left: 0; right: 0; display: none; justify-content: space-between; padding: 0 20px; z-index: 1000; }
+        /* Mobile Touch Controls - UPDATED */
+        #touch-controls { 
+            position: fixed; bottom: 20px; left: 0; right: 0; display: none; 
+            justify-content: space-between; padding: 0 20px; z-index: 1000;
+            touch-action: none; /* PREVENTS BROWSER SCROLL WHEN TOUCHING BUTTONS */
+        }
         .d-pad, .action-buttons { display: flex; gap: 10px; }
         .btn-touch {
             width: 55px; height: 55px; border-radius: 50%; background: rgba(0, 204, 255, 0.1); border: 2px solid rgba(0, 204, 255, 0.5);
             color: #00ccff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px); user-select: none;
         }
         .btn-touch:active { background: rgba(0, 204, 255, 0.4); }
 
@@ -224,7 +228,7 @@
         const P_WIDTH = 40; 
 
         // =====================================================
-        // 2. FIXED VERTICAL PROCEDURAL GENERATOR 
+        // 2. RESPONSIVE PROCEDURAL GENERATOR 
         // =====================================================
         const SPACING_Y = 600; 
         const START_Y = 100; // Ground Level
@@ -238,7 +242,7 @@
             let el = document.createElement('div');
             el.className = isMoving ? 'platform moving' : 'platform';
             el.style.width = `${w}px`; el.style.height = `${h}px`;
-            el.style.transform = `translate3d(${x}px, ${-(y - h)}px, 0)`; // y is the top surface
+            el.style.transform = `translate3d(${x}px, ${-(y - h)}px, 0)`; 
             world.appendChild(el);
             platforms.push({ element: el, x: x, y: y, w: w, h: h, isMoving: isMoving, vx: speed, startX: x, endX: x + distance });
         }
@@ -270,11 +274,13 @@
             windZones.push({ element: el, x: x, y: y, w: 120, h: targetY, force: 1.2, maxSpeed: 15 });
         }
 
-        // Base width logic for safe platform placement
-        const safeWidth = Math.min(screenW - 150, 800); 
-        const center = (screenW - 120) / 2; // Center of screen minus half project width
-        const leftSide = Math.max(20, (screenW - safeWidth) / 2);
-        const rightSide = leftSide + safeWidth - 150;
+        // Dynamic widths based on screen size ensuring cabinets (120px wide) fit
+        const baseW = Math.max(140, screenW * 0.25); 
+        const wideW = Math.max(180, screenW * 0.4);
+
+        const center = (screenW - baseW) / 2;
+        const leftSide = 20;
+        const rightSide = screenW - baseW - 20;
 
         projectsData.forEach((proj, i) => {
             let projY = START_Y + (i * SPACING_Y); 
@@ -283,58 +289,55 @@
             if (i % 3 === 1) projX = leftSide;
             if (i % 3 === 2) projX = rightSide;
 
-            // Generate traversal paths UPWARDS from previous project
             if (i > 0) {
                 let prevY = START_Y + ((i - 1) * SPACING_Y);
                 let prevX = center;
                 if ((i-1) % 3 === 1) prevX = leftSide;
                 if ((i-1) % 3 === 2) prevX = rightSide;
                 
-                let type = i % 3; // 3 core traversal logic paths
+                let type = i % 3; 
 
                 if (type === 0) {
-                    // Type 0: Zig-Zag Stairs
-                    addPlatform(center - 60, prevY + 150, 120, 20);
-                    addPlatform(projX === leftSide ? rightSide : leftSide, prevY + 300, 120, 20);
-                    addPlatform(projX - 60, prevY + 450, 120, 20);
+                    addPlatform(center, prevY + 150, baseW, 20);
+                    addPlatform(projX === leftSide ? rightSide : leftSide, prevY + 300, baseW, 20);
+                    addPlatform(projX, prevY + 450, baseW, 20);
                 }
                 else if (type === 1) {
-                    // Type 1: High Bounce Pad
                     let pX = (prevX === leftSide) ? rightSide : leftSide;
-                    addPlatform(pX, prevY + 150, 120, 20);
-                    addBouncePad(pX + 35, prevY + 150, 32); 
-                    
-                    // Moving safety net near the top
-                    addPlatform(projX - 60, prevY + 450, 150, 20, true, 2, 200); 
+                    addPlatform(pX, prevY + 150, baseW, 20);
+                    addBouncePad(pX + (baseW / 2) - 25, prevY + 150, 32); 
+                    addPlatform(projX - (wideW - baseW)/2, prevY + 450, wideW, 20, true, 2, screenW * 0.3); 
                 }
                 else if (type === 2) {
-                    // Type 2: Wind Tunnel
                     let wX = center;
-                    addPlatform(wX - 60, prevY + 100, 150, 20);
-                    addWindZone(wX - 15, prevY + 100, 350); 
-                    addPlatform(projX - 60, prevY + 450, 120, 20); 
+                    addPlatform(wX, prevY + 100, baseW, 20);
+                    addWindZone(wX + (baseW/2) - 60, prevY + 100, 350); 
+                    addPlatform(projX, prevY + 450, baseW, 20); 
                 }
 
-                // Random enemy on a middle platform occasionally
-                if (Math.random() > 0.5) addEnemy(center, prevY + 300, 100);
+                if (Math.random() > 0.5) addEnemy(center + (baseW/2) - 17, prevY + 300, baseW * 0.8);
             }
 
-            // The specific platform holding the Arcade Cabinet
-            if (projY > START_Y) addPlatform(projX - 30, projY, 180, 20);
+            // The platform holding the arcade cabinet
+            addPlatform(projX, projY, baseW, 20);
 
-            // Draw Arcade Cabinet
+            // Draw Arcade Cabinet, perfectly centered on the dynamic platform
             let station = document.createElement('div');
             station.className = 'project-station';
-            station.style.transform = `translate3d(${projX}px, ${-projY}px, 0)`;
+            
+            let cabinetX = projX + (baseW - 120) / 2; // Center 120px cabinet on baseW
+            
+            station.style.transform = `translate3d(${cabinetX}px, ${-projY}px, 0)`;
             station.innerHTML = `
                 <div class="station-label">${proj.title}</div>
                 <div class="project-screen"></div>
             `;
             
             station.onclick = () => { activeProject = {data: proj}; openActiveProject(); };
-            
             world.appendChild(station);
-            projectNodes.push({ element: station, x: projX, y: projY, width: 120, data: proj });
+            
+            // Store collision node with specific cabinet coordinates
+            projectNodes.push({ element: station, x: cabinetX, y: projY, width: 120, data: proj });
         });
 
 
@@ -344,7 +347,8 @@
         const charEl = document.getElementById('character');
         const promptEl = document.getElementById('interaction-prompt');
         
-        let pX = center + 40, pY = 100; // Start precisely on ground
+        let pX = center + (baseW / 2) - (P_WIDTH / 2); // Start perfectly centered 
+        let pY = 100; 
         let pVx = 0, pVy = 0; 
         const pH = 60;
         const speed = 7, friction = 0.8, gravity = 1.0, jumpForce = 20;
@@ -354,8 +358,14 @@
         let isGamePaused = false; 
         
         let autoPan = true;
+        
+        // Disable auto-pan ONLY when touching outside of controls or scrolling via wheel
         window.addEventListener('wheel', () => autoPan = false, {passive: true});
-        window.addEventListener('touchstart', () => autoPan = false, {passive: true});
+        window.addEventListener('touchstart', (e) => {
+            if (!e.target.closest('#touch-controls')) {
+                autoPan = false;
+            }
+        }, {passive: true});
 
         const keys = { left: false, right: false, up: false, interact: false };
 
@@ -368,14 +378,26 @@
         window.addEventListener('keydown', (e) => handleKey(e, true));
         window.addEventListener('keyup', (e) => handleKey(e, false));
 
+        // UPDATED TOUCH BINDINGS TO PREVENT BUBBLING
         function bindTouch(id, keyProp, isAction = false) {
             const el = document.getElementById(id);
-            el.addEventListener('pointerdown', (e) => { e.preventDefault(); autoPan = true; if(isAction) handleInteract(); else keys[keyProp] = true; });
+            if(!el) return;
+            
+            el.addEventListener('pointerdown', (e) => { 
+                e.preventDefault(); 
+                e.stopPropagation(); // Stops touchstart from detaching camera
+                autoPan = true; 
+                if(isAction) handleInteract(); 
+                else keys[keyProp] = true; 
+            });
             el.addEventListener('pointerup', (e) => { e.preventDefault(); keys[keyProp] = false; });
             el.addEventListener('pointercancel', (e) => { e.preventDefault(); keys[keyProp] = false; });
             el.addEventListener('pointerleave', (e) => { e.preventDefault(); keys[keyProp] = false; });
         }
-        bindTouch('btn-left', 'left'); bindTouch('btn-right', 'right'); bindTouch('btn-a', 'up'); bindTouch('btn-b', 'interact', true);
+        bindTouch('btn-left', 'left'); 
+        bindTouch('btn-right', 'right'); 
+        bindTouch('btn-a', 'up'); 
+        bindTouch('btn-b', 'interact', true);
 
         // =====================================================
         // 4. MAIN GAME LOOP
@@ -422,14 +444,12 @@
                 let targetY = pY + pVy;
                 currentPlatform = null;
 
-                // 4. ONE-WAY PLATFORM COLLISION (Only collide when falling down!)
+                // 4. ONE-WAY PLATFORM COLLISION
                 if (targetY <= 100) { targetY = 100; pVy = 0; currentPlatform = "ground"; } 
 
                 if (pVy <= 0 && !inWind) {
                     platforms.forEach(plat => {
-                        // Check if player's X overlaps the platform
                         if (pX + P_WIDTH > plat.x && pX < plat.x + plat.w) {
-                            // Check if player was previously ABOVE the platform, and is now BELOW or AT the platform
                             if (prevY >= plat.y && targetY <= plat.y) {
                                 targetY = plat.y; pVy = 0; currentPlatform = plat;
                             }
@@ -464,10 +484,12 @@
                 charEl.style.setProperty('--py', `${-pY}px`);
                 if(!charEl.classList.contains('facing-left')) charEl.style.transform = `translate3d(${pX}px, ${-pY}px, 0)`;
 
-                // 7. CAMERA PANNING (Native Scroll sync)
+                // 7. SMOOTH CAMERA PANNING
                 if (autoPan) {
                     let targetScroll = document.body.scrollHeight - pY - (window.innerHeight / 1.5);
-                    window.scrollTo(0, targetScroll);
+                    let currentScroll = window.scrollY;
+                    let newScroll = currentScroll + (targetScroll - currentScroll) * 0.15; // Smooth interpolation
+                    window.scrollTo(0, newScroll);
                 }
 
                 checkProximity();
@@ -517,4 +539,4 @@
         gameLoop();
     </script>
 </body>
-</html>
+</html>  
